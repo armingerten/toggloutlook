@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<customUI xmlns="http://schemas.microsoft.com/office/2009/07/customui" onLoad="Ribbon_Load">
+  <ribbon>
+    <tabs>
+      <tab idMso="TabCalendar">
+        <group id="togglGroup" label="Toggl" insertAfterMso="GroupCalendarNew" >
+          <button id="configureTogglPlugin" size="large" label="Configure" getImage="GetTogglIcon" onAction="OnConfigureTogglPluginClick" />
+        </group>
+      </tab>
+    </tabs>
+  </ribbon>
+  <contextMenus>
+    <contextMenu idMso="ContextMenuCalendarItem">
+      <button id="pushToToggl" onAction="OnPushToTogglClick" label="Send to Toggl" getImage="GetTogglIcon" />
+    </contextMenu>
+    <contextMenu idMso="ContextMenuMultipleItems">
+      <button id="pushMultipleToToggl" onAction="OnPushToTogglClick" label="Send to Toggl" getImage="GetTogglIcon" getVisible="GetContextMenuMultipleItemsIsVisible"/>
+    </contextMenu>
+  </contextMenus>
+</customUI>

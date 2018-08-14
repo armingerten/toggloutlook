@@ -1,0 +1,12 @@
+/artifacts
+
+/src/obj/
+/src/bin/
+/src/packages/*/
+
+/src/.vs/
+/src/.idea/
+/src/_ReSharper.*/
+/src/**/*.user
+/src/**/launchSettings.json
+.vscode/
