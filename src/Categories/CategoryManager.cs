@@ -23,21 +23,15 @@ namespace TogglOutlookPlugIn.Categories
 
         public bool TryAddCategory(int projectId, int tagId, string categoryName)
         {
-            Outlook.Category outlookCategory = this.OutlookCategories[categoryName];
-
-            if (outlookCategory != null)
-            {
-                return false;
-            }
-            if (categoryName.Contains(CategorySeperator))
+            if (this.IsInvalidCategoryName(categoryName))
             {
                 return false;
             }
 
-            this.OutlookCategories.Add(categoryName, Outlook.OlCategoryColor.olCategoryColorDarkRed);
+            Outlook.Category outlookCategory = EnsureOutlookCategoryExists(categoryName);
+
             CategoryList categoryList = new CategoryList(Properties.Settings.Default.CategoriesString, this.OutlookCategories);
-
-            categoryList.Add(new Category(categoryName, projectId, tagId, outlookCategory));
+            categoryList.AddOrUpdate(new Category(categoryName, projectId, tagId, outlookCategory));
 
             Properties.Settings.Default.CategoriesString = categoryList.ItemsAsXmlString;
             Properties.Settings.Default.Save();
@@ -58,5 +52,18 @@ namespace TogglOutlookPlugIn.Categories
             Properties.Settings.Default.CategoriesString = categoryList.ItemsAsXmlString;
             Properties.Settings.Default.Save();
         }
+
+        private Outlook.Category EnsureOutlookCategoryExists(string categoryName)
+        {
+            Outlook.Category outlookCategory = this.OutlookCategories[categoryName];
+            if (outlookCategory == null)
+            {
+                outlookCategory = this.OutlookCategories.Add(categoryName, Outlook.OlCategoryColor.olCategoryColorDarkRed);
+            }
+            return outlookCategory;
+        }
+
+        private bool IsInvalidCategoryName(string categoryName)
+            => categoryName.Contains(CategorySeperator);
     }
 }

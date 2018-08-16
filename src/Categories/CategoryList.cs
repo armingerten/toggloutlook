@@ -17,17 +17,15 @@ namespace TogglOutlookPlugIn.Categories
             {
                 try
                 {
-                    List<Category> categories = new List<Category>(DeserializeItemsFromXmlString(xmlString));
-                    DecorateAndConcatOutlookCategories(categories, outlookCategories);
-
-                    this.items = categories;
-                    return;
+                    this.items = new List<Category>(DeserializeItemsFromXmlString(xmlString));
                 }
                 catch (Exception)
                 {
+                    // Ignore de-serialization issues for now.
                 }
             }
-            this.items = new List<Category>();
+
+            DecorateAndConcatOutlookCategories(this.items ?? (this.items = new List<Category>()), outlookCategories);
         }
 
         [XmlArray("Items")]
@@ -52,8 +50,14 @@ namespace TogglOutlookPlugIn.Categories
             }
         }
 
-        public void Add(Category item)
+        public void AddOrUpdate(Category item)
         {
+            Category existingItem = this.items.FirstOrDefault(i => i.Name == item.Name);
+            if (existingItem != null)
+            {
+                this.items.Remove(existingItem);
+            }
+
             this.items.Add(item);
         }
 

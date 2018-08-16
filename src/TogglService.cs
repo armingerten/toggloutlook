@@ -15,21 +15,28 @@ namespace TogglOutlookPlugIn
 
         private WorkspaceServiceAsync workspaceService;
         private TimeEntryServiceAsync timeEntryService;
+        private string apiKey;
 
         private TogglService()
         {
-            if (!string.IsNullOrWhiteSpace(Properties.Settings.Default.ApiKey))
-            {
-                this.TryEstablishLink(Properties.Settings.Default.ApiKey);
-            }
+            this.TryEstablishLink(this.ApiKey);
         }
 
         public static TogglService Instance
             => instance ?? (instance = new TogglService());
 
-        public string ApiKey { get; private set; }
+        public string ApiKey
+        {
+            get => Properties.Settings.Default.ApiKey ?? string.Empty;
+            private set
+            {
+                this.apiKey = value;
+                Properties.Settings.Default.ApiKey = apiKey;
+                Properties.Settings.Default.Save();
+            }
+        }
 
-        public bool LinkEstablished { get; private set; }
+        public bool IsLinkEstablished { get; private set; }
 
         public List<Project> Projects { get; private set; } = new List<Project>();
 
@@ -41,6 +48,11 @@ namespace TogglOutlookPlugIn
 
         public bool TryEstablishLink(string apiKey)
         {
+            if (string.IsNullOrWhiteSpace(apiKey))
+            {
+                return false;
+            }
+
             try
             {
                 this.ApiKey = apiKey;
@@ -53,24 +65,26 @@ namespace TogglOutlookPlugIn
                 this.Projects = this.workspaceService.Projects(this.CurrentWorkspace.Id).Result;
                 this.Tags = this.workspaceService.Tags(this.CurrentWorkspace.Id).Result;
 
-                this.LinkEstablished = true;
+                this.IsLinkEstablished = true;
             }
             catch (Exception)
             {
+                this.ApiKey = string.Empty;
+
                 this.CurrentWorkspace = null;
                 this.Workspaces.Clear();
                 this.Projects.Clear();
                 this.Tags.Clear();
 
-                this.LinkEstablished = false;
+                this.IsLinkEstablished = false;
             }
 
-            return this.LinkEstablished;
+            return this.IsLinkEstablished;
         }
 
         public bool TrySwitchWorkspace(int workspaceId)
         {
-            if (!this.LinkEstablished)
+            if (!this.IsLinkEstablished)
             {
                 return false;
             }
@@ -100,21 +114,24 @@ namespace TogglOutlookPlugIn
         }
 
         public bool TryCreateTimeEntry(string description, DateTime startTime, DateTime endTime, Category category)
+            => this.TryCreateTimeEntry(description, startTime, endTime, category.ProjectId, category.TagId);
+
+        public bool TryCreateTimeEntry(string description, DateTime startTime, DateTime endTime, int projectId, int tagId)
         {
-            if (!this.LinkEstablished)
+            if (!this.IsLinkEstablished)
             {
                 return false;
             }
 
-            Project project = this.Projects.FirstOrDefault(p => p.Id == category.ProjectId);
-            Tag tag = this.Tags.FirstOrDefault(t => t.Id == category.TagId);
+            Project project = this.Projects.FirstOrDefault(p => p.Id == projectId);
+            Tag tag = this.Tags.FirstOrDefault(t => t.Id == tagId);
 
             if (project == null || tag == null)
             {
                 return false;
             }
 
-            if (this.IsAlreadyTimeEntryInSlot(startTime, endTime, category.ProjectId))
+            if (this.IsAlreadyTimeEntryInSlot(startTime, endTime, projectId))
             {
                 return false;
             }
