@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Windows.Forms;
 using Toggl.Api.DataObjects;
 using TogglOutlookPlugIn.Categories;
 using Office = Microsoft.Office.Core;
@@ -99,7 +100,7 @@ namespace TogglOutlookPlugIn
 
         private void PushAppointmentsWithCategoryToToggle(List<AppointmentItem> appointments)
         {
-            List<AppointmentItem> createdAppointments = new List<AppointmentItem>();
+            Dictionary<AppointmentItem, bool> processedAppointments = new Dictionary<AppointmentItem, bool>();
 
             appointments.ForEach(appointment =>
             {
@@ -107,13 +108,35 @@ namespace TogglOutlookPlugIn
                 {
                     if (this.Toggl.TryCreateTimeEntry(appointment.Subject, appointment.Start, appointment.End, category))
                     {
-                        createdAppointments.Add(appointment);
+                        processedAppointments.Add(appointment, true);
+                    }
+                    else
+                    {
+                        processedAppointments.Add(appointment, false);
                     }
                 }
             });
 
-            System.Windows.Forms.MessageBox.Show($"Created {createdAppointments.Count} appointment(s) in toggl");
+            if (processedAppointments.Values.Count(v => v) == appointments.Count)
+            {
+                this.ShowPushingAppointmentsMessageBox($"Created {appointments.Count} appointment(s) in Toggl");
+            }
+            else
+            {
+                StringBuilder stringBuilder = new StringBuilder();
+                foreach (var item in processedAppointments)
+                {
+                    stringBuilder.Append(item.Value ? "Created: " : "Not created: ");
+                    stringBuilder.AppendLine($"{item.Key.Subject} ({item.Key.Start.ToShortTimeString()} - {item.Key.End.ToShortTimeString()})");
+                }
+
+                this.ShowPushingAppointmentsMessageBox(stringBuilder.ToString());
+            }
+
         }
+
+        private void ShowPushingAppointmentsMessageBox(string message)
+            => MessageBox.Show(message, "Pushing appointment(s) to Toggl", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
         private void PushAppointmentsToToggle(List<AppointmentItem> appointments, int projectId, int tagId)
         {
