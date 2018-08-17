@@ -1,35 +1,30 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Data;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
-using TogglOutlookPlugIn.Categories;
 using TogglApi = Toggl.Api.DataObjects;
+using TogglOutlookPlugIn.Categories;
 
-namespace TogglOutlookPlugIn
+namespace TogglOutlookPlugIn.Settings
 {
-    public partial class ConfigureTogglForm : Form
+    public partial class CategoriesPanel : UserControl
     {
-        public ConfigureTogglForm()
+        public CategoriesPanel()
         {
-            this.InitializeComponent();
-
-            this.PopulateForm();
-        }
-
-        private CategoryManager CategoryManager => CategoryManager.Instance;
-
-        private TogglService Toggl => TogglService.Instance;
-
-        private void PopulateForm()
-        {
-            this.textBoxApiKey.Text = this.Toggl.ApiKey;
-
-            this.comboBoxWorkspace.DataSource = this.Toggl.Workspaces;
-            this.comboBoxWorkspace.DisplayMember = nameof(TogglApi.Workspace.Name);
-            this.comboBoxWorkspace.ValueMember = nameof(TogglApi.Workspace.Id);
+            InitializeComponent();
 
             this.PopulateComboBoxesProjectsAndTags();
             this.PopulateListViewCategories();
         }
+
+        private TogglService Toggl => TogglService.Instance;
+
+        private CategoryManager CategoryManager => CategoryManager.Instance;
 
         private void PopulateComboBoxesProjectsAndTags()
         {
@@ -70,47 +65,12 @@ namespace TogglOutlookPlugIn
         }
 
         private string GetProjectName(int projectId)
-        {
-            string name = this.Toggl.Projects.FirstOrDefault(project => project.Id == projectId)?.Name;
-            if (name != null)
-            {
-                return name;
-            }
-            else if (projectId == default(int))
-            {
-                return string.Empty;
-            }
-            else
-            {
-                return projectId.ToString();
-            }
-        }
+            => this.Toggl.Projects.FirstOrDefault(project => project.Id == projectId)?.Name
+            ?? (projectId == default(int) ? string.Empty : projectId.ToString());
 
         private string GetTagName(int tagId)
-        {
-            string name = this.Toggl.Tags.FirstOrDefault(tag => tag.Id == tagId)?.Name;
-
-            if (name != null)
-            {
-                return name;
-            }
-            else if (tagId == default(int))
-            {
-                return string.Empty;
-            }
-            else
-            {
-                return tagId.ToString();
-            }
-        }
-
-        private void OnButtonApplyApiKeyClick(object sender, EventArgs e)
-        {
-            if (this.Toggl.TryEstablishLink(this.textBoxApiKey.Text))
-            {
-                this.PopulateForm();
-            }
-        }
+            => this.Toggl.Tags.FirstOrDefault(tag => tag.Id == tagId)?.Name
+            ?? (tagId == default(int) ? string.Empty : tagId.ToString());
 
         private void OnButtonAddCategoryClick(object sender, EventArgs e)
         {
@@ -128,15 +88,8 @@ namespace TogglOutlookPlugIn
             }
         }
 
-        private void OnComboBoxWorkspaceSelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (this.comboBoxWorkspace.SelectedValue is int workspaceId && this.Toggl.TrySwitchWorkspace(workspaceId))
-            {
-                this.PopulateComboBoxesProjectsAndTags();
-            }
-        }
-
-        private void OnToolStripMenuItemDeleteCategoryClick(object sender, EventArgs e)
+        private void OnToolStripMenuItemDeleteCategoryClick
+            (object sender, EventArgs e)
         {
             if (this.listViewCategories.SelectedItems.Count < 1)
             {

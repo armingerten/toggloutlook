@@ -73,6 +73,11 @@ namespace TogglOutlookPlugIn.Categories
 
         private static void DecorateAndConcatOutlookCategories(List<Category> categories, Outlook.Categories outlookCategories)
         {
+            if (outlookCategories == null)
+            {
+                return;
+            }
+
             foreach (Outlook.Category outlookCategory in outlookCategories)
             {
                 Category category = categories.FirstOrDefault(c => c.Name == outlookCategory.Name);

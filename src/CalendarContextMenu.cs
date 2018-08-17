@@ -95,7 +95,8 @@ namespace TogglOutlookPlugIn
 
         public void OnConfigureTogglPluginClick(Office.IRibbonControl control)
         {
-            new ConfigureTogglForm().ShowDialog();
+            new Settings.SettingsDialog().ShowDialog();
+            //new Settings.ConfigureTogglForm().ShowDialog();
         }
 
         private void PushAppointmentsWithCategoryToToggle(List<AppointmentItem> appointments)

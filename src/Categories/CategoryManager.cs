@@ -12,7 +12,7 @@ namespace TogglOutlookPlugIn.Categories
         {
         }
 
-        private Outlook.Categories OutlookCategories => Globals.ThisAddIn.Application.Session.Categories;
+        private Outlook.Categories OutlookCategories => Globals.ThisAddIn?.Application.Session.Categories;
 
         public static CategoryManager Instance
             => instance ?? (instance = new CategoryManager());
