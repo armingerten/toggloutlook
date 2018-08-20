@@ -33,7 +33,7 @@
     <PublishUrl>..\artifacts\</PublishUrl>
     <InstallUrl />
     <TargetCulture>en</TargetCulture>
-    <ApplicationVersion>1.0.0.1</ApplicationVersion>
+    <ApplicationVersion>1.0.0.2</ApplicationVersion>
     <AutoIncrementApplicationRevision>true</AutoIncrementApplicationRevision>
     <UpdateEnabled>true</UpdateEnabled>
     <UpdateInterval>7</UpdateInterval>
@@ -192,18 +192,45 @@
     <Compile Include="Categories\Category.cs" />
     <Compile Include="Categories\CategoryList.cs" />
     <Compile Include="Categories\CategoryManager.cs" />
-    <Compile Include="ConfigureTogglForm.cs">
-      <SubType>Form</SubType>
+    <Compile Include="Settings\AboutPanel.cs">
+      <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="ConfigureTogglForm.Designer.cs">
-      <DependentUpon>ConfigureTogglForm.cs</DependentUpon>
+    <Compile Include="Settings\AboutPanel.Designer.cs">
+      <DependentUpon>AboutPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Settings\CategoriesPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Settings\CategoriesPanel.Designer.cs">
+      <DependentUpon>CategoriesPanel.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Settings\SettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Settings\SettingsDialog.Designer.cs">
+      <DependentUpon>SettingsDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Settings\AccountSettingsPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Settings\AccountSettingsPanel.Designer.cs">
+      <DependentUpon>AccountSettingsPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Settings\SyncPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Settings\SyncPanel.Designer.cs">
+      <DependentUpon>SyncPanel.cs</DependentUpon>
+    </Compile>
     <Compile Include="TogglService.cs" />
-    <EmbeddedResource Include="ConfigureTogglForm.resx">
-      <DependentUpon>ConfigureTogglForm.cs</DependentUpon>
+    <EmbeddedResource Include="Settings\AboutPanel.resx">
+      <DependentUpon>AboutPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Settings\CategoriesPanel.resx">
+      <DependentUpon>CategoriesPanel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -215,6 +242,15 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="Settings\SettingsDialog.resx">
+      <DependentUpon>SettingsDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Settings\AccountSettingsPanel.resx">
+      <DependentUpon>AccountSettingsPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Settings\SyncPanel.resx">
+      <DependentUpon>SyncPanel.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="app.config" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
@@ -245,6 +281,21 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Toggl.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\category32.png" />
+    <Content Include="Resources\category48.png" />
+    <Content Include="Resources\clock32.png" />
+    <Content Include="Resources\clock48.png" />
+    <Content Include="Resources\gear32.png" />
+    <Content Include="Resources\gear48.png" />
+    <Content Include="Resources\info32.png" />
+    <Content Include="Resources\info48.png" />
+    <Content Include="Resources\reload32.png" />
+    <Content Include="Resources\reload48.png" />
+    <None Include="Resources\trash32.png" />
+    <Content Include="Resources\user32.png" />
+    <Content Include="Resources\user48.png" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

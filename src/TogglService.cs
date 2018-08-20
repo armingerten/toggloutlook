@@ -13,6 +13,7 @@ namespace TogglOutlookPlugIn
 
         private static readonly string togglResponseDateFormat = "MM/dd/yyyy HH:mm:ss";
 
+        private UserServiceAsync userService;
         private WorkspaceServiceAsync workspaceService;
         private TimeEntryServiceAsync timeEntryService;
         private string apiKey;
@@ -21,6 +22,8 @@ namespace TogglOutlookPlugIn
         {
             this.TryEstablishLink(this.ApiKey);
         }
+
+        public event EventHandler<EventArgs> LinkStateChangedEvent;
 
         public static TogglService Instance
             => instance ?? (instance = new TogglService());
@@ -46,6 +49,8 @@ namespace TogglOutlookPlugIn
 
         public Workspace CurrentWorkspace { get; private set; }
 
+        public User CurrentUser { get; private set; }
+
         public bool TryEstablishLink(string apiKey)
         {
             if (string.IsNullOrWhiteSpace(apiKey))
@@ -59,24 +64,29 @@ namespace TogglOutlookPlugIn
 
                 this.workspaceService = new WorkspaceServiceAsync(apiKey);
                 this.timeEntryService = new TimeEntryServiceAsync(apiKey);
+                this.userService = new UserServiceAsync(apiKey);
 
                 this.Workspaces = this.workspaceService.List().Result;
                 this.CurrentWorkspace = this.Workspaces.First();
+                this.CurrentUser = this.userService.GetCurrent().Result;
                 this.Projects = this.workspaceService.Projects(this.CurrentWorkspace.Id).Result;
                 this.Tags = this.workspaceService.Tags(this.CurrentWorkspace.Id).Result;
 
                 this.IsLinkEstablished = true;
+                this.LinkStateChangedEvent?.Invoke(this, EventArgs.Empty);
             }
             catch (Exception)
             {
                 this.ApiKey = string.Empty;
 
                 this.CurrentWorkspace = null;
+                this.CurrentUser = null;
                 this.Workspaces.Clear();
                 this.Projects.Clear();
                 this.Tags.Clear();
 
                 this.IsLinkEstablished = false;
+                this.LinkStateChangedEvent?.Invoke(this, EventArgs.Empty);
             }
 
             return this.IsLinkEstablished;
