@@ -33,7 +33,7 @@
     <PublishUrl>..\artifacts\</PublishUrl>
     <InstallUrl />
     <TargetCulture>en</TargetCulture>
-    <ApplicationVersion>1.0.0.1</ApplicationVersion>
+    <ApplicationVersion>1.0.0.2</ApplicationVersion>
     <AutoIncrementApplicationRevision>true</AutoIncrementApplicationRevision>
     <UpdateEnabled>true</UpdateEnabled>
     <UpdateInterval>7</UpdateInterval>
@@ -293,6 +293,7 @@
     <Content Include="Resources\info48.png" />
     <Content Include="Resources\reload32.png" />
     <Content Include="Resources\reload48.png" />
+    <None Include="Resources\trash32.png" />
     <Content Include="Resources\user32.png" />
     <Content Include="Resources\user48.png" />
   </ItemGroup>

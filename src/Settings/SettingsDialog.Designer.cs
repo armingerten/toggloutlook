@@ -51,7 +51,7 @@
             this.panelNavigation.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelNavigation.Location = new System.Drawing.Point(0, 0);
             this.panelNavigation.Name = "panelNavigation";
-            this.panelNavigation.Size = new System.Drawing.Size(800, 60);
+            this.panelNavigation.Size = new System.Drawing.Size(784, 60);
             this.panelNavigation.TabIndex = 0;
             // 
             // buttonSyncNavigation
@@ -99,7 +99,7 @@
             this.buttonAboutNavigation.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.buttonAboutNavigation.Image = global::TogglOutlookPlugIn.Properties.Resources.info32;
             this.buttonAboutNavigation.ImageAlign = System.Drawing.ContentAlignment.TopCenter;
-            this.buttonAboutNavigation.Location = new System.Drawing.Point(722, 0);
+            this.buttonAboutNavigation.Location = new System.Drawing.Point(706, 0);
             this.buttonAboutNavigation.Name = "buttonAboutNavigation";
             this.buttonAboutNavigation.Size = new System.Drawing.Size(75, 58);
             this.buttonAboutNavigation.TabIndex = 18;
@@ -130,7 +130,7 @@
             this.panelCategories.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelCategories.Location = new System.Drawing.Point(0, 60);
             this.panelCategories.Name = "panelCategories";
-            this.panelCategories.Size = new System.Drawing.Size(800, 390);
+            this.panelCategories.Size = new System.Drawing.Size(784, 401);
             this.panelCategories.TabIndex = 4;
             // 
             // panelAbout
@@ -138,7 +138,7 @@
             this.panelAbout.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelAbout.Location = new System.Drawing.Point(0, 60);
             this.panelAbout.Name = "panelAbout";
-            this.panelAbout.Size = new System.Drawing.Size(800, 390);
+            this.panelAbout.Size = new System.Drawing.Size(784, 401);
             this.panelAbout.TabIndex = 3;
             // 
             // panelAccountSettings
@@ -146,7 +146,7 @@
             this.panelAccountSettings.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelAccountSettings.Location = new System.Drawing.Point(0, 60);
             this.panelAccountSettings.Name = "panelAccountSettings";
-            this.panelAccountSettings.Size = new System.Drawing.Size(800, 390);
+            this.panelAccountSettings.Size = new System.Drawing.Size(784, 401);
             this.panelAccountSettings.TabIndex = 1;
             // 
             // panelSync
@@ -154,20 +154,21 @@
             this.panelSync.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelSync.Location = new System.Drawing.Point(0, 60);
             this.panelSync.Name = "panelSync";
-            this.panelSync.Size = new System.Drawing.Size(800, 390);
+            this.panelSync.Size = new System.Drawing.Size(784, 401);
             this.panelSync.TabIndex = 5;
             // 
             // SettingsDialog
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(784, 461);
             this.Controls.Add(this.panelAccountSettings);
             this.Controls.Add(this.panelSync);
             this.Controls.Add(this.panelCategories);
             this.Controls.Add(this.panelAbout);
             this.Controls.Add(this.panelNavigation);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MinimumSize = new System.Drawing.Size(800, 500);
             this.Name = "SettingsDialog";
             this.Text = "Configure Toggl integration";
             this.panelNavigation.ResumeLayout(false);

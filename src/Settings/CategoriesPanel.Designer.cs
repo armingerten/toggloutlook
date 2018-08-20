@@ -102,12 +102,13 @@
             this.contextMenuStripListViewCategories.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripMenuItemDeleteCategory});
             this.contextMenuStripListViewCategories.Name = "contextMenuStripListViewCategories";
-            this.contextMenuStripListViewCategories.Size = new System.Drawing.Size(157, 26);
+            this.contextMenuStripListViewCategories.Size = new System.Drawing.Size(181, 48);
             // 
             // toolStripMenuItemDeleteCategory
             // 
+            this.toolStripMenuItemDeleteCategory.Image = global::TogglOutlookPlugIn.Properties.Resources.trash32;
             this.toolStripMenuItemDeleteCategory.Name = "toolStripMenuItemDeleteCategory";
-            this.toolStripMenuItemDeleteCategory.Size = new System.Drawing.Size(156, 22);
+            this.toolStripMenuItemDeleteCategory.Size = new System.Drawing.Size(180, 22);
             this.toolStripMenuItemDeleteCategory.Text = "Delete category";
             this.toolStripMenuItemDeleteCategory.Click += new System.EventHandler(this.OnToolStripMenuItemDeleteCategoryClick);
             // 

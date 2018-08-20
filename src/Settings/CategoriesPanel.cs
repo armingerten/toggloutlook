@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
-using System.Data;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using TogglApi = Toggl.Api.DataObjects;
 using TogglOutlookPlugIn.Categories;
@@ -53,11 +48,11 @@ namespace TogglOutlookPlugIn.Settings
                 listViewItem.SubItems.Add(this.GetTagName(category.TagId));
                 if (category.IsOutlookOnly)
                 {
-                    listViewItem.ForeColor = System.Drawing.Color.Gray;
+                    listViewItem.ForeColor = Color.Gray;
                 }
                 else if (category.IsOutlookCategoryMissing)
                 {
-                    listViewItem.ForeColor = System.Drawing.Color.Red;
+                    listViewItem.ForeColor = Color.Red;
                 }
 
                 this.listViewCategories.Items.Add(listViewItem);
