@@ -160,4 +160,10 @@
   <data name="trash32" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\trash32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="wand32" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\wand32.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="wand48" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\wand48.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

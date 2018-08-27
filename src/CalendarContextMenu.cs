@@ -1,5 +1,4 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -8,7 +7,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
-using Toggl.Api.DataObjects;
+using Microsoft.Office.Interop.Outlook;
 using TogglOutlookPlugIn.Categories;
 using Office = Microsoft.Office.Core;
 
@@ -23,10 +22,17 @@ namespace TogglOutlookPlugIn
         {
         }
 
-        private TogglService Toggl => TogglService.Instance;
+        private TogglService Toggl
+            => TogglService.Instance;
+
+        private Folder CalendarFolder
+            => Globals.ThisAddIn.Application.Session.GetDefaultFolder(OlDefaultFolders.olFolderCalendar) as Folder;
 
         public Image GetTogglIcon(Office.IRibbonControl control)
             => Properties.Resources.Toggl;
+
+        public Image GetFitToBoundariesIcon(Office.IRibbonControl control)
+            => Properties.Resources.wand48;
 
         public bool GetContextMenuMultipleItemsIsVisible(Office.IRibbonControl control)
             => (control.Context as Selection)?[1] is AppointmentItem;
@@ -36,13 +42,10 @@ namespace TogglOutlookPlugIn
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.AppendLine("<menu xmlns=\"http://schemas.microsoft.com/office/2006/01/customui\" >");
 
-            foreach (Project project in this.Toggl.Projects)
-            {
-                stringBuilder.AppendLine($"<dynamicMenu id=\"p{project.Id}\" label=\"{project.Name}\"  getContent=\"OnPushAsProjectSubMenuGetContent\" />");
-            }
+            this.Toggl.Projects.ForEach(project => stringBuilder
+                .AppendLine($"<dynamicMenu id=\"p{project.Id}\" label=\"{project.Name}\"  getContent=\"OnPushAsProjectSubMenuGetContent\" />"));
 
             stringBuilder.Append("</menu>");
-
             return stringBuilder.ToString();
         }
 
@@ -51,35 +54,33 @@ namespace TogglOutlookPlugIn
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.AppendLine("<menu xmlns=\"http://schemas.microsoft.com/office/2006/01/customui\" >");
 
-            foreach (Tag tag in this.Toggl.Tags)
-            {
-                stringBuilder.AppendLine($"<button id=\"{control.Id}t{tag.Id}\" label=\"{tag.Name}\" onAction=\"OnPushAsClick\" />");
-            }
+            this.Toggl.Tags.ForEach(tag => stringBuilder
+                .AppendLine($"<button id=\"{control.Id}t{tag.Id}\" label=\"{tag.Name}\" onAction=\"OnButtonPushAsClick\" />"));
 
             stringBuilder.Append("</menu>");
 
             return stringBuilder.ToString();
         }
 
-        public void OnPushAsClick(Office.IRibbonControl control)
+        /// <summary>
+        /// Pushes the currently selected appointment items to Toggl by applying the chosen Project / Tag.
+        /// </summary>
+        /// <param name="control">The clicked "PushAs" button containing the project / tag pattern as identifier.</param>
+        public void OnButtonPushAsClick(Office.IRibbonControl control)
         {
             var buttonIdComponents = control.Id.TrimStart('p').Split('t');
             int projectId = int.Parse(buttonIdComponents[0]);
             int tagId = int.Parse(buttonIdComponents[1]);
 
-            List<AppointmentItem> appointments = new List<AppointmentItem>();
-            foreach (object item in ((Selection)control.Context))
-            {
-                if (item is AppointmentItem appointmentItem)
-                {
-                    appointments.Add(appointmentItem);
-                }
-            }
-
-            this.PushAppointmentsToToggle(appointments, projectId, tagId);
+            this.PushAppointmentsToToggle(GetSelectedAppointments(control), projectId, tagId);
         }
 
         public void OnQuickPushClick(Office.IRibbonControl control)
+        {
+            this.PushAppointmentsWithCategoryToToggle(GetSelectedAppointments(control));
+        }
+
+        private static List<AppointmentItem> GetSelectedAppointments(Office.IRibbonControl control)
         {
             List<AppointmentItem> appointments = new List<AppointmentItem>();
             foreach (object item in ((Selection)control.Context))
@@ -90,8 +91,63 @@ namespace TogglOutlookPlugIn
                 }
             }
 
-            this.PushAppointmentsWithCategoryToToggle(appointments);
+            return appointments;
         }
+
+        public void OnFitToBoundariesClick(Office.IRibbonControl control)
+        {
+            AppointmentItem selectedAppointment = GetSelectedAppointments(control).FirstOrDefault();
+
+            // Ensure selected appointment is eligible to be fitted
+            if (selectedAppointment == null
+                || selectedAppointment.Conflicts.Count > 0
+                || selectedAppointment.Start.Date != selectedAppointment.End.Date)
+            {
+                return;
+            }
+
+            // Determine predecessor & successor appointments (if any that day)
+            AppointmentItem predecessor = null;
+            AppointmentItem successor = null;
+            foreach (AppointmentItem appointmentItem in this.GetAppointsmentsForDay(selectedAppointment.Start))
+            {
+                if (appointmentItem.End <= selectedAppointment.Start)
+                {
+                    predecessor = appointmentItem;
+                    continue;
+                }
+
+                if (successor == null && appointmentItem.Start >= selectedAppointment.End)
+                {
+                    successor = appointmentItem;
+                }
+            }
+
+            // Set new appointment start time (if a predecessor was found that day)
+            if (predecessor != null)
+            {
+                int newDuration = (int)(selectedAppointment.End - predecessor.End).TotalMinutes;
+                selectedAppointment.Start = predecessor.End;
+                selectedAppointment.Duration = newDuration;
+            }
+
+            // Set new appointment end time (if a sucessor was found that day)
+            if (successor != null)
+            {
+                selectedAppointment.End = successor.Start;
+            }
+
+            selectedAppointment.Save();
+        }
+
+        private Items GetAppointsmentsForDay(DateTime dateTime)
+        {
+            Items items = this.CalendarFolder.Items;
+            items.IncludeRecurrences = true;
+            items.Sort("[Start]", Type.Missing);
+            return items.Restrict($"[Start] >= '{dateTime.Date.ToString("g")}' AND [End] <= '{dateTime.Date.AddDays(1).ToString("g")}'");
+        }
+
 
         public void OnConfigureTogglPluginClick(Office.IRibbonControl control)
         {
@@ -150,7 +206,7 @@ namespace TogglOutlookPlugIn
                 }
             });
 
-            System.Windows.Forms.MessageBox.Show($"Created {createdAppointments.Count} appointment(s) in toggl");
+            MessageBox.Show($"Created {createdAppointments.Count} appointment(s) in toggl");
         }
 
         private bool TryParseCategory(AppointmentItem appointment, out Categories.Category category)

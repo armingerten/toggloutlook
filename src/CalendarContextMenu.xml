@@ -11,12 +11,15 @@
   </ribbon>
   <contextMenus>
     <contextMenu idMso="ContextMenuCalendarItem">
+      <menuSeparator id="togglSeperator"/>
+      <button id="fitToBoundaries" onAction="OnFitToBoundariesClick" label="Fit to boundaries" getImage="GetFitToBoundariesIcon" />
       <button id="quickPush" onAction="OnQuickPushClick" label="Quick push" getImage="GetTogglIcon" />
       <dynamicMenu id="pushAs" label="Push as" getImage="GetTogglIcon" getContent="OnPushAsGetContent" />
     </contextMenu>
     <contextMenu idMso="ContextMenuMultipleItems">
+      <menuSeparator id="togglSeperatorMultiple"/>
       <button id="quickPushMultiple" onAction="OnQuickPushClick" label="Quick push" getImage="GetTogglIcon" getVisible="GetContextMenuMultipleItemsIsVisible"/>
-    <dynamicMenu id="pushMultipleAs" label="Push as" getImage="GetTogglIcon" getContent="OnPushAsGetContent" />
+      <dynamicMenu id="pushMultipleAs" label="Push as" getImage="GetTogglIcon" getContent="OnPushAsGetContent" />
     </contextMenu>
   </contextMenus>
 </customUI>

@@ -293,6 +293,8 @@
     <Content Include="Resources\info48.png" />
     <Content Include="Resources\reload32.png" />
     <Content Include="Resources\reload48.png" />
+    <None Include="Resources\wand48.png" />
+    <None Include="Resources\wand32.png" />
     <None Include="Resources\trash32.png" />
     <Content Include="Resources\user32.png" />
     <Content Include="Resources\user48.png" />
