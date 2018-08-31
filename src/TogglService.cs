@@ -123,10 +123,27 @@ namespace TogglOutlookPlugIn
             }
         }
 
+        public void CreateTimeEntriesIfSlotIsFree(List<(string description, DateTime startTime, DateTime endTime, Category category)> newTimeEntries)
+        {
+            if (!this.IsLinkEstablished)
+            {
+                return;
+            }
+
+            List<TimeEntry> existingTimeEntries = this.timeEntryService.List().Result;
+            newTimeEntries.ForEach(entry =>
+            {
+                this.TryCreateTimeEntry(existingTimeEntries, entry.description, entry.startTime, entry.endTime, entry.category.ProjectId, entry.category.TagId);
+            });
+        }
+
         public bool TryCreateTimeEntry(string description, DateTime startTime, DateTime endTime, Category category)
-            => this.TryCreateTimeEntry(description, startTime, endTime, category.ProjectId, category.TagId);
+            => this.TryCreateTimeEntry(this.timeEntryService.List().Result, description, startTime, endTime, category.ProjectId, category.TagId);
 
         public bool TryCreateTimeEntry(string description, DateTime startTime, DateTime endTime, int projectId, int tagId)
+            => this.TryCreateTimeEntry(this.timeEntryService.List().Result, description, startTime, endTime, projectId, tagId);
+
+        private bool TryCreateTimeEntry(List<TimeEntry> existingTimeEntries, string description, DateTime startTime, DateTime endTime, int projectId, int tagId)
         {
             if (!this.IsLinkEstablished)
             {
@@ -141,7 +158,7 @@ namespace TogglOutlookPlugIn
                 return false;
             }
 
-            if (this.IsAlreadyTimeEntryInSlot(startTime, endTime, projectId))
+            if (this.IsAlreadyTimeEntryInSlot(existingTimeEntries, startTime, endTime, projectId))
             {
                 return false;
             }
@@ -169,8 +186,9 @@ namespace TogglOutlookPlugIn
             }
         }
 
-        private bool IsAlreadyTimeEntryInSlot(DateTime startTime, DateTime endTime, int projectId)
-            => this.timeEntryService.List().Result.FirstOrDefault(entry
+
+        private bool IsAlreadyTimeEntryInSlot(List<TimeEntry> existingTimeEntries, DateTime startTime, DateTime endTime, int projectId)
+            => existingTimeEntries.FirstOrDefault(entry
                 => DateTime.ParseExact(entry.Start, togglResponseDateFormat, null) == startTime
                 && DateTime.ParseExact(entry.Stop, togglResponseDateFormat, null) == endTime
                 && entry.WorkspaceId == this.CurrentWorkspace.Id

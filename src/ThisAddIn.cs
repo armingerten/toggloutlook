@@ -11,6 +11,7 @@ namespace TogglOutlookPlugIn
 
         private void ThisAddIn_Startup(object sender, System.EventArgs e)
         {
+            Synchronization.SynchronizationService.Instance.Start();
         }
 
         private void ThisAddIn_Shutdown(object sender, System.EventArgs e)

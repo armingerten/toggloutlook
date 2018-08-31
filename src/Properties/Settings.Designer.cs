@@ -46,5 +46,17 @@ namespace TogglOutlookPlugIn.Properties {
                 this["CategoriesString"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int SyncOption {
+            get {
+                return ((int)(this["SyncOption"]));
+            }
+            set {
+                this["SyncOption"] = value;
+            }
+        }
     }
 }

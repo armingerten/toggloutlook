@@ -4,18 +4,18 @@ using Outlook = Microsoft.Office.Interop.Outlook;
 
 namespace TogglOutlookPlugIn.Categories
 {
-    public class CategoryManager
+    public class CategoryService
     {
-        private static CategoryManager instance;
+        private static CategoryService instance;
 
-        private CategoryManager()
+        private CategoryService()
         {
         }
 
         private Outlook.Categories OutlookCategories => Globals.ThisAddIn?.Application.Session.Categories;
 
-        public static CategoryManager Instance
-            => instance ?? (instance = new CategoryManager());
+        public static CategoryService Instance
+            => instance ?? (instance = new CategoryService());
 
         public static string CategorySeperator => ";";
 
