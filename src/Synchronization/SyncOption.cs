@@ -4,6 +4,6 @@
     {
         NoSync = 0,
         SyncCurrentDay,
-        SyncCurrentWeek
+        SyncLastSevenDays
     }
 }

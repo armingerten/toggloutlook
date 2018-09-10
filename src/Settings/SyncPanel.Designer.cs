@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.groupBoxSyncOption = new System.Windows.Forms.GroupBox();
-            this.radioButtonSyncCurrentWeek = new System.Windows.Forms.RadioButton();
+            this.radioButtonSyncLastSevenDays = new System.Windows.Forms.RadioButton();
             this.radioButtonSyncCurrentDay = new System.Windows.Forms.RadioButton();
             this.radioButtonNoSync = new System.Windows.Forms.RadioButton();
             this.groupBoxSyncOption.SuspendLayout();
@@ -40,7 +40,7 @@
             this.groupBoxSyncOption.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBoxSyncOption.Controls.Add(this.radioButtonSyncCurrentWeek);
+            this.groupBoxSyncOption.Controls.Add(this.radioButtonSyncLastSevenDays);
             this.groupBoxSyncOption.Controls.Add(this.radioButtonSyncCurrentDay);
             this.groupBoxSyncOption.Controls.Add(this.radioButtonNoSync);
             this.groupBoxSyncOption.Location = new System.Drawing.Point(12, 8);
@@ -50,18 +50,17 @@
             this.groupBoxSyncOption.TabStop = false;
             this.groupBoxSyncOption.Text = "Sync options";
             // 
-            // radioButtonSyncCurrentWeek
+            // radioButtonSyncLastSevenDays
             // 
-            this.radioButtonSyncCurrentWeek.AutoSize = true;
-            this.radioButtonSyncCurrentWeek.Enabled = false;
-            this.radioButtonSyncCurrentWeek.Location = new System.Drawing.Point(14, 73);
-            this.radioButtonSyncCurrentWeek.Name = "radioButtonSyncCurrentWeek";
-            this.radioButtonSyncCurrentWeek.Size = new System.Drawing.Size(148, 17);
-            this.radioButtonSyncCurrentWeek.TabIndex = 4;
-            this.radioButtonSyncCurrentWeek.TabStop = true;
-            this.radioButtonSyncCurrentWeek.Text = "Synchronize current week";
-            this.radioButtonSyncCurrentWeek.UseVisualStyleBackColor = true;
-            this.radioButtonSyncCurrentWeek.CheckedChanged += new System.EventHandler(this.OnRadioButtonSyncCheckedChanged);
+            this.radioButtonSyncLastSevenDays.AutoSize = true;
+            this.radioButtonSyncLastSevenDays.Location = new System.Drawing.Point(14, 73);
+            this.radioButtonSyncLastSevenDays.Name = "radioButtonSyncLastSevenDays";
+            this.radioButtonSyncLastSevenDays.Size = new System.Drawing.Size(159, 17);
+            this.radioButtonSyncLastSevenDays.TabIndex = 4;
+            this.radioButtonSyncLastSevenDays.TabStop = true;
+            this.radioButtonSyncLastSevenDays.Text = "Synchronize last seven days";
+            this.radioButtonSyncLastSevenDays.UseVisualStyleBackColor = true;
+            this.radioButtonSyncLastSevenDays.CheckedChanged += new System.EventHandler(this.OnRadioButtonSyncCheckedChanged);
             // 
             // radioButtonSyncCurrentDay
             // 
@@ -103,7 +102,7 @@
         #endregion
 
         private System.Windows.Forms.GroupBox groupBoxSyncOption;
-        private System.Windows.Forms.RadioButton radioButtonSyncCurrentWeek;
+        private System.Windows.Forms.RadioButton radioButtonSyncLastSevenDays;
         private System.Windows.Forms.RadioButton radioButtonSyncCurrentDay;
         private System.Windows.Forms.RadioButton radioButtonNoSync;
     }

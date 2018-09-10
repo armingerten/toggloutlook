@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Office.Interop.Outlook;
+using System;
 using System.Collections.Generic;
 using System.Timers;
 
@@ -26,14 +27,7 @@ namespace TogglOutlookPlugIn.Synchronization
         public SyncOption SynchronizationOption
         {
             get => this.syncOption;
-            set
-            {
-                this.syncOption = value;
-                this.AdaptScheduling();
-
-                Properties.Settings.Default.SyncOption = (int)value;
-                Properties.Settings.Default.Save();
-            }
+            set => this.AdaptScheduling(value);
         }
 
         public void Start()
@@ -47,12 +41,16 @@ namespace TogglOutlookPlugIn.Synchronization
         private TogglService Toggl
             => TogglService.Instance;
 
-        private void AdaptScheduling()
+        private void AdaptScheduling(SyncOption syncOption)
         {
-            switch (this.syncOption)
+            this.syncOption = syncOption;
+            Properties.Settings.Default.SyncOption = (int)syncOption;
+            Properties.Settings.Default.Save();
+
+            switch (syncOption)
             {
                 case SyncOption.SyncCurrentDay:
-                case SyncOption.SyncCurrentWeek:
+                case SyncOption.SyncLastSevenDays:
                     if (!this.synchronizationTimer.Enabled)
                     {
                         this.synchronizationTimer.Start();
@@ -68,7 +66,22 @@ namespace TogglOutlookPlugIn.Synchronization
         private void SynchronizeWithToggl()
         {
             var newTimeEntries = new List<(string description, DateTime startTime, DateTime endTime, Categories.Category category)>();
-            Calendar.GetAppointsmentsForDay(DateTime.Now).ForEach(appointment =>
+
+            List<AppointmentItem> appointmentItems;
+            switch (this.syncOption)
+            {
+                case SyncOption.SyncCurrentDay:
+                    appointmentItems = Calendar.GetAppointmentsForDay(DateTime.Now);
+                    break;
+                case SyncOption.SyncLastSevenDays:
+                    appointmentItems = Calendar.GetAppointmentsForLastSevenDays(DateTime.Now);
+                    break;
+                default:
+                    appointmentItems = new List<AppointmentItem>(0);
+                    break;
+            }
+
+            appointmentItems.ForEach(appointment =>
             {
                 if (Calendar.TryParseCategory(appointment, out Categories.Category category))
                 {
@@ -86,7 +99,7 @@ namespace TogglOutlookPlugIn.Synchronization
                 this.synchronizationTimer.Stop();
                 this.SynchronizeWithToggl();
             }
-            catch (Exception)
+            catch (System.Exception)
             {
                 // No logging in place currently
             }

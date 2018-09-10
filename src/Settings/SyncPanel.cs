@@ -26,8 +26,8 @@ namespace TogglOutlookPlugIn.Settings
                     this.radioButtonSyncCurrentDay.Checked = true;
                     return;
 
-                case SyncOption.SyncCurrentWeek:
-                    this.radioButtonSyncCurrentWeek.Checked = true;
+                case SyncOption.SyncLastSevenDays:
+                    this.radioButtonSyncLastSevenDays.Checked = true;
                     return;
 
                 default:
@@ -48,9 +48,9 @@ namespace TogglOutlookPlugIn.Settings
             {
                 SynchronizationService.Instance.SynchronizationOption = SyncOption.SyncCurrentDay;
             }
-            else if (this.radioButtonSyncCurrentWeek.Checked)
+            else if (this.radioButtonSyncLastSevenDays.Checked)
             {
-                SynchronizationService.Instance.SynchronizationOption = SyncOption.SyncCurrentWeek;
+                SynchronizationService.Instance.SynchronizationOption = SyncOption.SyncLastSevenDays;
             }
             else
             {

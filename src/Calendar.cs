@@ -27,7 +27,7 @@ namespace TogglOutlookPlugIn
         {
             AppointmentItem predecessor = null;
             AppointmentItem successor = null;
-            foreach (AppointmentItem currentItem in GetItemsForDay(appointment.Start))
+            foreach (AppointmentItem currentItem in GetItemsBetween(appointment.Start.Date, appointment.Start.Date.AddDays(1)))
             {
                 if (currentItem.End <= appointment.Start)
                 {
@@ -44,10 +44,16 @@ namespace TogglOutlookPlugIn
             return (predecessor, successor);
         }
 
-        public static List<AppointmentItem> GetAppointsmentsForDay(DateTime dateTime)
+        public static List<AppointmentItem> GetAppointmentsForDay(DateTime dateTime)
+            => GetItemsBetween(dateTime.Date, dateTime.Date.AddDays(1)).ToAppointmentItemList();
+
+        public static List<AppointmentItem> GetAppointmentsForLastSevenDays(DateTime dateTime)
+            => GetItemsBetween(dateTime.Date.AddDays(-6), dateTime.Date.AddDays(1)).ToAppointmentItemList();
+
+        public static List<AppointmentItem> ToAppointmentItemList(this Items items)
         {
             List<AppointmentItem> appointmentItems = new List<AppointmentItem>();
-            foreach (AppointmentItem appointmentItem in GetItemsForDay(dateTime))
+            foreach (AppointmentItem appointmentItem in items)
             {
                 appointmentItems.Add(appointmentItem);
             }
@@ -55,12 +61,12 @@ namespace TogglOutlookPlugIn
             return appointmentItems;
         }
 
-        private static Items GetItemsForDay(DateTime dateTime)
+        private static Items GetItemsBetween(DateTime startDateTime, DateTime endDateTime)
         {
             Items items = CalendarFolder.Items;
             items.IncludeRecurrences = true;
             items.Sort("[Start]", Type.Missing);
-            return items.Restrict($"[Start] >= '{dateTime.Date.ToString("g")}' AND [End] <= '{dateTime.Date.AddDays(1).ToString("g")}'");
+            return items.Restrict($"[Start] >= '{startDateTime.ToString("g")}' AND [End] <= '{endDateTime.ToString("g")}'");
         }
     }
 }
