@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 using Toggl.Api.DataObjects;
+using TogglOutlookPlugIn.Services;
 
 namespace TogglOutlookPlugIn.Settings
 {
@@ -8,7 +9,7 @@ namespace TogglOutlookPlugIn.Settings
     {
         public AccountSettingsPanel()
         {
-            InitializeComponent();
+            this.InitializeComponent();
 
             this.PopulateForm();
         }

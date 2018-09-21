@@ -1,8 +1,8 @@
 ﻿using System.Linq;
-
+using TogglOutlookPlugIn.Models;
 using Outlook = Microsoft.Office.Interop.Outlook;
 
-namespace TogglOutlookPlugIn.Categories
+namespace TogglOutlookPlugIn.Services
 {
     public class CategoryService
     {
@@ -28,7 +28,7 @@ namespace TogglOutlookPlugIn.Categories
                 return false;
             }
 
-            Outlook.Category outlookCategory = EnsureOutlookCategoryExists(categoryName);
+            Outlook.Category outlookCategory = this.EnsureOutlookCategoryExists(categoryName);
 
             CategoryList categoryList = new CategoryList(Properties.Settings.Default.CategoriesString, this.OutlookCategories);
             categoryList.AddOrUpdate(new Category(categoryName, projectId, tagId, outlookCategory));

@@ -1,21 +1,24 @@
-﻿using Microsoft.Office.Interop.Outlook;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Timers;
+using TogglOutlookPlugIn.Models;
+using TogglOutlookPlugIn.Services;
 
 namespace TogglOutlookPlugIn.Synchronization
 {
     public class SynchronizationService
     {
         private static SynchronizationService instance;
-        private static readonly double timeoutTimerFrequencyInMs = 10 * 60 * 1000d;
+        private static readonly double timeoutTimerFrequencyInMs = 1 * 60 * 1000d;
 
         private readonly Timer synchronizationTimer;
         private SyncOption syncOption;
+        private bool isOutlookAuthority;
 
         public SynchronizationService()
         {
             this.syncOption = (SyncOption)Properties.Settings.Default.SyncOption;
+            this.isOutlookAuthority = Properties.Settings.Default.IsOutlookAuthority;
 
             this.synchronizationTimer = new Timer(timeoutTimerFrequencyInMs);
             this.synchronizationTimer.Elapsed += this.OnSynchronizationTimerElapsed;
@@ -28,6 +31,17 @@ namespace TogglOutlookPlugIn.Synchronization
         {
             get => this.syncOption;
             set => this.AdaptScheduling(value);
+        }
+
+        public bool IsOutlookAuthority
+        {
+            get => this.isOutlookAuthority;
+            set
+            {
+                this.isOutlookAuthority = value;
+                Properties.Settings.Default.IsOutlookAuthority = value;
+                Properties.Settings.Default.Save();
+            }
         }
 
         public void Start()
@@ -65,31 +79,29 @@ namespace TogglOutlookPlugIn.Synchronization
 
         private void SynchronizeWithToggl()
         {
-            var newTimeEntries = new List<(string description, DateTime startTime, DateTime endTime, Categories.Category category)>();
-
-            List<AppointmentItem> appointmentItems;
+            DateTime startTime;
+            DateTime endTime = DateTime.Now.Date.AddDays(1);
             switch (this.syncOption)
             {
                 case SyncOption.SyncCurrentDay:
-                    appointmentItems = Calendar.GetAppointmentsForDay(DateTime.Now);
+                    startTime = DateTime.Now.Date;
                     break;
                 case SyncOption.SyncLastSevenDays:
-                    appointmentItems = Calendar.GetAppointmentsForLastSevenDays(DateTime.Now);
+                    startTime = DateTime.Now.Date.AddDays(-6);
                     break;
                 default:
-                    appointmentItems = new List<AppointmentItem>(0);
-                    break;
+                    return;
             }
 
-            appointmentItems.ForEach(appointment =>
+            List<CategorizedAppointment> categorizedAppointments = Calendar.GetAppointmentsBetween(startTime, endTime);
+            if (this.IsOutlookAuthority)
             {
-                if (Calendar.TryParseCategory(appointment, out Categories.Category category))
-                {
-                    newTimeEntries.Add((appointment.Subject, appointment.Start, appointment.End, category));
-                }
-            });
-
-            this.Toggl.CreateTimeEntriesIfSlotIsFree(newTimeEntries);
+                this.Toggl.CreateOrUpdateAppointments(categorizedAppointments);
+            }
+            else
+            {
+                this.Toggl.CreateAppointmentsIfSlotIsFree(categorizedAppointments);
+            }
         }
 
         private void OnSynchronizationTimerElapsed(object sender, ElapsedEventArgs e)
@@ -99,7 +111,7 @@ namespace TogglOutlookPlugIn.Synchronization
                 this.synchronizationTimer.Stop();
                 this.SynchronizeWithToggl();
             }
-            catch (System.Exception)
+            catch (Exception)
             {
                 // No logging in place currently
             }

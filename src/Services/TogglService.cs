@@ -3,25 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using Toggl.Api.DataObjects;
 using Toggl.Api.Services;
-using TogglOutlookPlugIn.Categories;
+using TogglOutlookPlugIn.Models;
 
-namespace TogglOutlookPlugIn
+namespace TogglOutlookPlugIn.Services
 {
     public class TogglService
     {
         private static TogglService instance;
-
-        private static readonly string togglResponseDateFormat = "MM/dd/yyyy HH:mm:ss";
 
         private UserServiceAsync userService;
         private WorkspaceServiceAsync workspaceService;
         private TimeEntryServiceAsync timeEntryService;
         private string apiKey;
 
-        private TogglService()
-        {
-            this.TryEstablishLink(this.ApiKey);
-        }
+        private TogglService() => this.TryEstablishLink(this.ApiKey);
 
         public event EventHandler<EventArgs> LinkStateChangedEvent;
 
@@ -34,7 +29,7 @@ namespace TogglOutlookPlugIn
             private set
             {
                 this.apiKey = value;
-                Properties.Settings.Default.ApiKey = apiKey;
+                Properties.Settings.Default.ApiKey = this.apiKey;
                 Properties.Settings.Default.Save();
             }
         }
@@ -123,7 +118,7 @@ namespace TogglOutlookPlugIn
             }
         }
 
-        public void CreateTimeEntriesIfSlotIsFree(List<(string description, DateTime startTime, DateTime endTime, Category category)> newTimeEntries)
+        public void CreateOrUpdateAppointments(List<CategorizedAppointment> appointments)
         {
             if (!this.IsLinkEstablished)
             {
@@ -131,19 +126,42 @@ namespace TogglOutlookPlugIn
             }
 
             List<TimeEntry> existingTimeEntries = this.timeEntryService.List().Result;
-            newTimeEntries.ForEach(entry =>
+
+            // Determine and delete conflicting entries
+            long[] conflictingTimeEntries = this.GetConflictingTimeEntryIds(existingTimeEntries, appointments);
+            if (conflictingTimeEntries.Length > 0)
             {
-                this.TryCreateTimeEntry(existingTimeEntries, entry.description, entry.startTime, entry.endTime, entry.category.ProjectId, entry.category.TagId);
+                this.timeEntryService.Delete(conflictingTimeEntries).Wait();
+            }
+
+            // Create specified entries
+            this.CreateAppointmentsIfSlotIsFree(appointments);
+        }
+
+        public void CreateAppointmentsIfSlotIsFree(List<CategorizedAppointment> appointments)
+        {
+            if (!this.IsLinkEstablished)
+            {
+                return;
+            }
+
+            List<TimeEntry> existingTimeEntries = this.timeEntryService.List().Result;
+            appointments.ForEach(appointment =>
+            {
+                this.TryCreateAppointment(existingTimeEntries, appointment);
             });
         }
 
-        public bool TryCreateTimeEntry(string description, DateTime startTime, DateTime endTime, Category category)
-            => this.TryCreateTimeEntry(this.timeEntryService.List().Result, description, startTime, endTime, category.ProjectId, category.TagId);
+        public bool TryCreateAppointment(CategorizedAppointment categorizedAppointment)
+            => this.TryCreateAppointment(this.timeEntryService.List().Result, categorizedAppointment);
 
-        public bool TryCreateTimeEntry(string description, DateTime startTime, DateTime endTime, int projectId, int tagId)
-            => this.TryCreateTimeEntry(this.timeEntryService.List().Result, description, startTime, endTime, projectId, tagId);
+        public bool TryCreateAppointment(string description, DateTime startTime, DateTime endTime, int projectId, int tagId)
+            => this.TryCreateAppointment(this.timeEntryService.List().Result, description, startTime, endTime, projectId, tagId);
 
-        private bool TryCreateTimeEntry(List<TimeEntry> existingTimeEntries, string description, DateTime startTime, DateTime endTime, int projectId, int tagId)
+        private bool TryCreateAppointment(List<TimeEntry> existingTimeEntries, CategorizedAppointment ca)
+            => this.TryCreateAppointment(existingTimeEntries, ca.Description, ca.StartTime, ca.EndTime, ca.Category.ProjectId, ca.Category.TagId);
+
+        private bool TryCreateAppointment(List<TimeEntry> existingTimeEntries, string description, DateTime startTime, DateTime endTime, int projectId, int tagId)
         {
             if (!this.IsLinkEstablished)
             {
@@ -158,7 +176,7 @@ namespace TogglOutlookPlugIn
                 return false;
             }
 
-            if (this.IsAlreadyTimeEntryInSlot(existingTimeEntries, startTime, endTime, projectId))
+            if (existingTimeEntries.Any(timeEntry => timeEntry.IsOverlappingWith(startTime, endTime)))
             {
                 return false;
             }
@@ -186,12 +204,18 @@ namespace TogglOutlookPlugIn
             }
         }
 
+        private long[] GetConflictingTimeEntryIds(List<TimeEntry> existingTimeEntries, List<CategorizedAppointment> appointments)
+        {
+            List<long> conflictingTimeEntryIds = new List<long>();
+            appointments.ForEach(appointment =>
+            {
+                conflictingTimeEntryIds.AddRange(
+                    existingTimeEntries
+                        .Where(timeEntry => timeEntry.IsConflictingWith(appointment))
+                        .Select(timeEntry => (long)timeEntry.Id));
+            });
 
-        private bool IsAlreadyTimeEntryInSlot(List<TimeEntry> existingTimeEntries, DateTime startTime, DateTime endTime, int projectId)
-            => existingTimeEntries.FirstOrDefault(entry
-                => DateTime.ParseExact(entry.Start, togglResponseDateFormat, null) == startTime
-                && DateTime.ParseExact(entry.Stop, togglResponseDateFormat, null) == endTime
-                && entry.WorkspaceId == this.CurrentWorkspace.Id
-                && entry.ProjectId == projectId) != null;
+            return conflictingTimeEntryIds.ToArray();
+        }
     }
 }

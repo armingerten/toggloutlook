@@ -190,9 +190,11 @@
   <ItemGroup>
     <Compile Include="Calendar.cs" />
     <Compile Include="CalendarContextMenu.cs" />
-    <Compile Include="Categories\Category.cs" />
-    <Compile Include="Categories\CategoryList.cs" />
-    <Compile Include="Categories\CategoryService.cs" />
+    <Compile Include="Models\CategorizedAppointment.cs" />
+    <Compile Include="Models\Category.cs" />
+    <Compile Include="Models\CategoryList.cs" />
+    <Compile Include="Services\CategoryService.cs" />
+    <Compile Include="Services\TimeEntryExtensions.cs" />
     <Compile Include="Settings\AboutPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -228,7 +230,7 @@
     </Compile>
     <Compile Include="Synchronization\SynchronizationService.cs" />
     <Compile Include="Synchronization\SyncOption.cs" />
-    <Compile Include="TogglService.cs" />
+    <Compile Include="Services\TogglService.cs" />
     <EmbeddedResource Include="Settings\AboutPanel.resx">
       <DependentUpon>AboutPanel.cs</DependentUpon>
     </EmbeddedResource>

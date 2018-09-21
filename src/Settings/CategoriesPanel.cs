@@ -2,8 +2,9 @@
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using TogglOutlookPlugIn.Models;
+using TogglOutlookPlugIn.Services;
 using TogglApi = Toggl.Api.DataObjects;
-using TogglOutlookPlugIn.Categories;
 
 namespace TogglOutlookPlugIn.Settings
 {
@@ -11,7 +12,7 @@ namespace TogglOutlookPlugIn.Settings
     {
         public CategoriesPanel()
         {
-            InitializeComponent();
+            this.InitializeComponent();
 
             this.PopulateComboBoxesProjectsAndTags();
             this.PopulateListViewCategories();

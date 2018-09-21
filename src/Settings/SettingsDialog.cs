@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
+using TogglOutlookPlugIn.Services;
 
 namespace TogglOutlookPlugIn.Settings
 {
@@ -8,7 +9,7 @@ namespace TogglOutlookPlugIn.Settings
     {
         public SettingsDialog()
         {
-            InitializeComponent();
+            this.InitializeComponent();
 
             this.buttonCategoriesNavigation.Visible = this.Toggl.IsLinkEstablished;
             this.buttonSyncNavigation.Visible = this.Toggl.IsLinkEstablished;

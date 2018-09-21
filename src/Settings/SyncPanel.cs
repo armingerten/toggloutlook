@@ -12,8 +12,10 @@ namespace TogglOutlookPlugIn.Settings
         {
             this.isInitializing = true;
 
-            InitializeComponent();
-            InitializeRadioButtons();
+            this.InitializeComponent();
+            this.InitializeRadioButtons();
+
+            this.checkBoxIsOutlookAuthority.Checked = SynchronizationService.Instance.IsOutlookAuthority;
 
             this.isInitializing = false;
         }
@@ -56,6 +58,16 @@ namespace TogglOutlookPlugIn.Settings
             {
                 SynchronizationService.Instance.SynchronizationOption = SyncOption.NoSync;
             }
+        }
+
+        private void OnCheckBoxIsOutlookAuthorityCheckedChanged(object sender, EventArgs e)
+        {
+            if (this.isInitializing)
+            {
+                return;
+            }
+
+            SynchronizationService.Instance.IsOutlookAuthority = this.checkBoxIsOutlookAuthority.Checked;
         }
     }
 }

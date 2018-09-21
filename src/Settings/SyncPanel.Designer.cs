@@ -32,13 +32,15 @@
             this.radioButtonSyncLastSevenDays = new System.Windows.Forms.RadioButton();
             this.radioButtonSyncCurrentDay = new System.Windows.Forms.RadioButton();
             this.radioButtonNoSync = new System.Windows.Forms.RadioButton();
+            this.groupBoxConflictResolutionOptions = new System.Windows.Forms.GroupBox();
+            this.checkBoxIsOutlookAuthority = new System.Windows.Forms.CheckBox();
             this.groupBoxSyncOption.SuspendLayout();
+            this.groupBoxConflictResolutionOptions.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBoxSyncOption
             // 
-            this.groupBoxSyncOption.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.groupBoxSyncOption.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBoxSyncOption.Controls.Add(this.radioButtonSyncLastSevenDays);
             this.groupBoxSyncOption.Controls.Add(this.radioButtonSyncCurrentDay);
@@ -86,15 +88,41 @@
             this.radioButtonNoSync.UseVisualStyleBackColor = true;
             this.radioButtonNoSync.CheckedChanged += new System.EventHandler(this.OnRadioButtonSyncCheckedChanged);
             // 
+            // groupBoxConflictResolutionOptions
+            // 
+            this.groupBoxConflictResolutionOptions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBoxConflictResolutionOptions.Controls.Add(this.checkBoxIsOutlookAuthority);
+            this.groupBoxConflictResolutionOptions.Location = new System.Drawing.Point(12, 120);
+            this.groupBoxConflictResolutionOptions.Name = "groupBoxConflictResolutionOptions";
+            this.groupBoxConflictResolutionOptions.Size = new System.Drawing.Size(676, 100);
+            this.groupBoxConflictResolutionOptions.TabIndex = 2;
+            this.groupBoxConflictResolutionOptions.TabStop = false;
+            this.groupBoxConflictResolutionOptions.Text = "Conflict options";
+            // 
+            // checkBoxIsOutlookAuthority
+            // 
+            this.checkBoxIsOutlookAuthority.AutoSize = true;
+            this.checkBoxIsOutlookAuthority.Location = new System.Drawing.Point(14, 29);
+            this.checkBoxIsOutlookAuthority.Name = "checkBoxIsOutlookAuthority";
+            this.checkBoxIsOutlookAuthority.Size = new System.Drawing.Size(142, 17);
+            this.checkBoxIsOutlookAuthority.TabIndex = 0;
+            this.checkBoxIsOutlookAuthority.Text = "Use Outlook as authority";
+            this.checkBoxIsOutlookAuthority.UseVisualStyleBackColor = true;
+            this.checkBoxIsOutlookAuthority.CheckedChanged += new System.EventHandler(this.OnCheckBoxIsOutlookAuthorityCheckedChanged);
+            // 
             // SyncPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.groupBoxConflictResolutionOptions);
             this.Controls.Add(this.groupBoxSyncOption);
             this.Name = "SyncPanel";
             this.Size = new System.Drawing.Size(700, 400);
             this.groupBoxSyncOption.ResumeLayout(false);
             this.groupBoxSyncOption.PerformLayout();
+            this.groupBoxConflictResolutionOptions.ResumeLayout(false);
+            this.groupBoxConflictResolutionOptions.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -105,5 +133,7 @@
         private System.Windows.Forms.RadioButton radioButtonSyncLastSevenDays;
         private System.Windows.Forms.RadioButton radioButtonSyncCurrentDay;
         private System.Windows.Forms.RadioButton radioButtonNoSync;
+        private System.Windows.Forms.GroupBox groupBoxConflictResolutionOptions;
+        private System.Windows.Forms.CheckBox checkBoxIsOutlookAuthority;
     }
 }
