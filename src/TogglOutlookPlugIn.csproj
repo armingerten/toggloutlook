@@ -188,10 +188,13 @@
     can be found.
   -->
   <ItemGroup>
+    <Compile Include="Calendar.cs" />
     <Compile Include="CalendarContextMenu.cs" />
-    <Compile Include="Categories\Category.cs" />
-    <Compile Include="Categories\CategoryList.cs" />
-    <Compile Include="Categories\CategoryManager.cs" />
+    <Compile Include="Models\CategorizedAppointment.cs" />
+    <Compile Include="Models\Category.cs" />
+    <Compile Include="Models\CategoryList.cs" />
+    <Compile Include="Services\CategoryService.cs" />
+    <Compile Include="Services\TimeEntryExtensions.cs" />
     <Compile Include="Settings\AboutPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -225,7 +228,9 @@
     <Compile Include="Settings\SyncPanel.Designer.cs">
       <DependentUpon>SyncPanel.cs</DependentUpon>
     </Compile>
-    <Compile Include="TogglService.cs" />
+    <Compile Include="Synchronization\SynchronizationService.cs" />
+    <Compile Include="Synchronization\SyncOption.cs" />
+    <Compile Include="Services\TogglService.cs" />
     <EmbeddedResource Include="Settings\AboutPanel.resx">
       <DependentUpon>AboutPanel.cs</DependentUpon>
     </EmbeddedResource>

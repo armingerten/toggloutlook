@@ -28,32 +28,112 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.labelComingSoon = new System.Windows.Forms.Label();
+            this.groupBoxSyncOption = new System.Windows.Forms.GroupBox();
+            this.radioButtonSyncLastSevenDays = new System.Windows.Forms.RadioButton();
+            this.radioButtonSyncCurrentDay = new System.Windows.Forms.RadioButton();
+            this.radioButtonNoSync = new System.Windows.Forms.RadioButton();
+            this.groupBoxConflictResolutionOptions = new System.Windows.Forms.GroupBox();
+            this.checkBoxIsOutlookAuthority = new System.Windows.Forms.CheckBox();
+            this.groupBoxSyncOption.SuspendLayout();
+            this.groupBoxConflictResolutionOptions.SuspendLayout();
             this.SuspendLayout();
             // 
-            // labelComingSoon
+            // groupBoxSyncOption
             // 
-            this.labelComingSoon.AutoSize = true;
-            this.labelComingSoon.Location = new System.Drawing.Point(12, 14);
-            this.labelComingSoon.Name = "labelComingSoon";
-            this.labelComingSoon.Size = new System.Drawing.Size(88, 13);
-            this.labelComingSoon.TabIndex = 0;
-            this.labelComingSoon.Text = "Comming soon ...";
+            this.groupBoxSyncOption.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBoxSyncOption.Controls.Add(this.radioButtonSyncLastSevenDays);
+            this.groupBoxSyncOption.Controls.Add(this.radioButtonSyncCurrentDay);
+            this.groupBoxSyncOption.Controls.Add(this.radioButtonNoSync);
+            this.groupBoxSyncOption.Location = new System.Drawing.Point(12, 8);
+            this.groupBoxSyncOption.Name = "groupBoxSyncOption";
+            this.groupBoxSyncOption.Size = new System.Drawing.Size(676, 106);
+            this.groupBoxSyncOption.TabIndex = 1;
+            this.groupBoxSyncOption.TabStop = false;
+            this.groupBoxSyncOption.Text = "Sync options";
+            // 
+            // radioButtonSyncLastSevenDays
+            // 
+            this.radioButtonSyncLastSevenDays.AutoSize = true;
+            this.radioButtonSyncLastSevenDays.Location = new System.Drawing.Point(14, 73);
+            this.radioButtonSyncLastSevenDays.Name = "radioButtonSyncLastSevenDays";
+            this.radioButtonSyncLastSevenDays.Size = new System.Drawing.Size(159, 17);
+            this.radioButtonSyncLastSevenDays.TabIndex = 4;
+            this.radioButtonSyncLastSevenDays.TabStop = true;
+            this.radioButtonSyncLastSevenDays.Text = "Synchronize last seven days";
+            this.radioButtonSyncLastSevenDays.UseVisualStyleBackColor = true;
+            this.radioButtonSyncLastSevenDays.CheckedChanged += new System.EventHandler(this.OnRadioButtonSyncCheckedChanged);
+            // 
+            // radioButtonSyncCurrentDay
+            // 
+            this.radioButtonSyncCurrentDay.AutoSize = true;
+            this.radioButtonSyncCurrentDay.Location = new System.Drawing.Point(14, 50);
+            this.radioButtonSyncCurrentDay.Name = "radioButtonSyncCurrentDay";
+            this.radioButtonSyncCurrentDay.Size = new System.Drawing.Size(139, 17);
+            this.radioButtonSyncCurrentDay.TabIndex = 3;
+            this.radioButtonSyncCurrentDay.TabStop = true;
+            this.radioButtonSyncCurrentDay.Text = "Synchronize current day";
+            this.radioButtonSyncCurrentDay.UseVisualStyleBackColor = true;
+            this.radioButtonSyncCurrentDay.CheckedChanged += new System.EventHandler(this.OnRadioButtonSyncCheckedChanged);
+            // 
+            // radioButtonNoSync
+            // 
+            this.radioButtonNoSync.AutoSize = true;
+            this.radioButtonNoSync.Location = new System.Drawing.Point(14, 27);
+            this.radioButtonNoSync.Name = "radioButtonNoSync";
+            this.radioButtonNoSync.Size = new System.Drawing.Size(115, 17);
+            this.radioButtonNoSync.TabIndex = 2;
+            this.radioButtonNoSync.TabStop = true;
+            this.radioButtonNoSync.Text = "No synchronization";
+            this.radioButtonNoSync.UseVisualStyleBackColor = true;
+            this.radioButtonNoSync.CheckedChanged += new System.EventHandler(this.OnRadioButtonSyncCheckedChanged);
+            // 
+            // groupBoxConflictResolutionOptions
+            // 
+            this.groupBoxConflictResolutionOptions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBoxConflictResolutionOptions.Controls.Add(this.checkBoxIsOutlookAuthority);
+            this.groupBoxConflictResolutionOptions.Location = new System.Drawing.Point(12, 120);
+            this.groupBoxConflictResolutionOptions.Name = "groupBoxConflictResolutionOptions";
+            this.groupBoxConflictResolutionOptions.Size = new System.Drawing.Size(676, 100);
+            this.groupBoxConflictResolutionOptions.TabIndex = 2;
+            this.groupBoxConflictResolutionOptions.TabStop = false;
+            this.groupBoxConflictResolutionOptions.Text = "Conflict options";
+            // 
+            // checkBoxIsOutlookAuthority
+            // 
+            this.checkBoxIsOutlookAuthority.AutoSize = true;
+            this.checkBoxIsOutlookAuthority.Location = new System.Drawing.Point(14, 29);
+            this.checkBoxIsOutlookAuthority.Name = "checkBoxIsOutlookAuthority";
+            this.checkBoxIsOutlookAuthority.Size = new System.Drawing.Size(142, 17);
+            this.checkBoxIsOutlookAuthority.TabIndex = 0;
+            this.checkBoxIsOutlookAuthority.Text = "Use Outlook as authority";
+            this.checkBoxIsOutlookAuthority.UseVisualStyleBackColor = true;
+            this.checkBoxIsOutlookAuthority.CheckedChanged += new System.EventHandler(this.OnCheckBoxIsOutlookAuthorityCheckedChanged);
             // 
             // SyncPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.labelComingSoon);
+            this.Controls.Add(this.groupBoxConflictResolutionOptions);
+            this.Controls.Add(this.groupBoxSyncOption);
             this.Name = "SyncPanel";
             this.Size = new System.Drawing.Size(700, 400);
+            this.groupBoxSyncOption.ResumeLayout(false);
+            this.groupBoxSyncOption.PerformLayout();
+            this.groupBoxConflictResolutionOptions.ResumeLayout(false);
+            this.groupBoxConflictResolutionOptions.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
         #endregion
 
-        private System.Windows.Forms.Label labelComingSoon;
+        private System.Windows.Forms.GroupBox groupBoxSyncOption;
+        private System.Windows.Forms.RadioButton radioButtonSyncLastSevenDays;
+        private System.Windows.Forms.RadioButton radioButtonSyncCurrentDay;
+        private System.Windows.Forms.RadioButton radioButtonNoSync;
+        private System.Windows.Forms.GroupBox groupBoxConflictResolutionOptions;
+        private System.Windows.Forms.CheckBox checkBoxIsOutlookAuthority;
     }
 }

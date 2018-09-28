@@ -1,21 +1,21 @@
 ﻿using System.Linq;
-
+using TogglOutlookPlugIn.Models;
 using Outlook = Microsoft.Office.Interop.Outlook;
 
-namespace TogglOutlookPlugIn.Categories
+namespace TogglOutlookPlugIn.Services
 {
-    public class CategoryManager
+    public class CategoryService
     {
-        private static CategoryManager instance;
+        private static CategoryService instance;
 
-        private CategoryManager()
+        private CategoryService()
         {
         }
 
         private Outlook.Categories OutlookCategories => Globals.ThisAddIn?.Application.Session.Categories;
 
-        public static CategoryManager Instance
-            => instance ?? (instance = new CategoryManager());
+        public static CategoryService Instance
+            => instance ?? (instance = new CategoryService());
 
         public static string CategorySeperator => ";";
 
@@ -28,7 +28,7 @@ namespace TogglOutlookPlugIn.Categories
                 return false;
             }
 
-            Outlook.Category outlookCategory = EnsureOutlookCategoryExists(categoryName);
+            Outlook.Category outlookCategory = this.EnsureOutlookCategoryExists(categoryName);
 
             CategoryList categoryList = new CategoryList(Properties.Settings.Default.CategoriesString, this.OutlookCategories);
             categoryList.AddOrUpdate(new Category(categoryName, projectId, tagId, outlookCategory));

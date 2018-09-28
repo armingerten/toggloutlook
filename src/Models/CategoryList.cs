@@ -5,7 +5,7 @@ using System.Linq;
 using System.Xml.Serialization;
 using Outlook = Microsoft.Office.Interop.Outlook;
 
-namespace TogglOutlookPlugIn.Categories
+namespace TogglOutlookPlugIn.Models
 {
     public class CategoryList
     {

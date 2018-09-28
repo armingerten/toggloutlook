@@ -2,8 +2,9 @@
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using TogglOutlookPlugIn.Models;
+using TogglOutlookPlugIn.Services;
 using TogglApi = Toggl.Api.DataObjects;
-using TogglOutlookPlugIn.Categories;
 
 namespace TogglOutlookPlugIn.Settings
 {
@@ -11,7 +12,7 @@ namespace TogglOutlookPlugIn.Settings
     {
         public CategoriesPanel()
         {
-            InitializeComponent();
+            this.InitializeComponent();
 
             this.PopulateComboBoxesProjectsAndTags();
             this.PopulateListViewCategories();
@@ -19,7 +20,7 @@ namespace TogglOutlookPlugIn.Settings
 
         private TogglService Toggl => TogglService.Instance;
 
-        private CategoryManager CategoryManager => CategoryManager.Instance;
+        private CategoryService CategoryService => CategoryService.Instance;
 
         private void PopulateComboBoxesProjectsAndTags()
         {
@@ -37,7 +38,7 @@ namespace TogglOutlookPlugIn.Settings
         private void PopulateListViewCategories()
         {
             this.listViewCategories.Items.Clear();
-            foreach (Category category in this.CategoryManager.Categories)
+            foreach (Category category in this.CategoryService.Categories)
             {
                 ListViewItem listViewItem = new ListViewItem(category.Name)
                 {
@@ -74,7 +75,7 @@ namespace TogglOutlookPlugIn.Settings
                 return;
             }
 
-            if (this.CategoryManager.TryAddCategory(
+            if (this.CategoryService.TryAddCategory(
                 (int)this.comboBoxProjects.SelectedValue,
                 (int)this.comboBoxTags.SelectedValue,
                 this.textBoxCategoryName.Text))
@@ -93,7 +94,7 @@ namespace TogglOutlookPlugIn.Settings
 
             if ((this.listViewCategories.SelectedItems[0].Tag is Category selectedCategory))
             {
-                this.CategoryManager.RemoveCategory(selectedCategory);
+                this.CategoryService.RemoveCategory(selectedCategory);
                 this.PopulateListViewCategories();
             }
         }

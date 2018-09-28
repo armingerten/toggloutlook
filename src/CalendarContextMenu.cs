@@ -8,7 +8,8 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 using Microsoft.Office.Interop.Outlook;
-using TogglOutlookPlugIn.Categories;
+using TogglOutlookPlugIn.Models;
+using TogglOutlookPlugIn.Services;
 using Office = Microsoft.Office.Core;
 
 namespace TogglOutlookPlugIn
@@ -25,17 +26,17 @@ namespace TogglOutlookPlugIn
         private TogglService Toggl
             => TogglService.Instance;
 
-        private Folder CalendarFolder
-            => Globals.ThisAddIn.Application.Session.GetDefaultFolder(OlDefaultFolders.olFolderCalendar) as Folder;
-
         public Image GetTogglIcon(Office.IRibbonControl control)
             => Properties.Resources.Toggl;
 
         public Image GetFitToBoundariesIcon(Office.IRibbonControl control)
             => Properties.Resources.wand48;
 
-        public bool GetContextMenuMultipleItemsIsVisible(Office.IRibbonControl control)
+        public bool IsContextMenuMultipleItemsVisible(Office.IRibbonControl control)
             => (control.Context as Selection)?[1] is AppointmentItem;
+
+        public bool IsPushAsVisible(Office.IRibbonControl control)
+            => Synchronization.SynchronizationService.Instance.SynchronizationOption == Synchronization.SyncOption.NoSync;
 
         public string OnPushAsGetContent(Office.IRibbonControl control)
         {
@@ -75,15 +76,12 @@ namespace TogglOutlookPlugIn
             this.PushAppointmentsToToggle(GetSelectedAppointments(control), projectId, tagId);
         }
 
-        public void OnQuickPushClick(Office.IRibbonControl control)
-        {
-            this.PushAppointmentsWithCategoryToToggle(GetSelectedAppointments(control));
-        }
+        public void OnQuickPushClick(Office.IRibbonControl control) => this.PushAppointmentsWithCategoryToToggle(GetSelectedAppointments(control));
 
         private static List<AppointmentItem> GetSelectedAppointments(Office.IRibbonControl control)
         {
             List<AppointmentItem> appointments = new List<AppointmentItem>();
-            foreach (object item in ((Selection)control.Context))
+            foreach (object item in (Selection)control.Context)
             {
                 if (item is AppointmentItem appointmentItem)
                 {
@@ -107,21 +105,7 @@ namespace TogglOutlookPlugIn
             }
 
             // Determine predecessor & successor appointments (if any that day)
-            AppointmentItem predecessor = null;
-            AppointmentItem successor = null;
-            foreach (AppointmentItem appointmentItem in this.GetAppointsmentsForDay(selectedAppointment.Start))
-            {
-                if (appointmentItem.End <= selectedAppointment.Start)
-                {
-                    predecessor = appointmentItem;
-                    continue;
-                }
-
-                if (successor == null && appointmentItem.Start >= selectedAppointment.End)
-                {
-                    successor = appointmentItem;
-                }
-            }
+            var (predecessor, successor) = Calendar.GetSurroundingAppointmentsTheSameDay(selectedAppointment);
 
             // Set new appointment start time (if a predecessor was found that day)
             if (predecessor != null)
@@ -140,19 +124,7 @@ namespace TogglOutlookPlugIn
             selectedAppointment.Save();
         }
 
-        private Items GetAppointsmentsForDay(DateTime dateTime)
-        {
-            Items items = this.CalendarFolder.Items;
-            items.IncludeRecurrences = true;
-            items.Sort("[Start]", Type.Missing);
-            return items.Restrict($"[Start] >= '{dateTime.Date.ToString("g")}' AND [End] <= '{dateTime.Date.AddDays(1).ToString("g")}'");
-        }
-
-
-        public void OnConfigureTogglPluginClick(Office.IRibbonControl control)
-        {
-            new Settings.SettingsDialog().ShowDialog();
-        }
+        public void OnConfigureTogglPluginClick(Office.IRibbonControl control) => new Settings.SettingsDialog().ShowDialog();
 
         private void PushAppointmentsWithCategoryToToggle(List<AppointmentItem> appointments)
         {
@@ -160,9 +132,9 @@ namespace TogglOutlookPlugIn
 
             appointments.ForEach(appointment =>
             {
-                if (this.TryParseCategory(appointment, out Categories.Category category))
+                if (Calendar.TryParseCategorizedAppointment(appointment, out CategorizedAppointment categorizedAppointment))
                 {
-                    if (this.Toggl.TryCreateTimeEntry(appointment.Subject, appointment.Start, appointment.End, category))
+                    if (this.Toggl.TryCreateAppointment(categorizedAppointment))
                     {
                         processedAppointments.Add(appointment, true);
                     }
@@ -200,7 +172,7 @@ namespace TogglOutlookPlugIn
 
             appointments.ForEach(appointment =>
             {
-                if (this.Toggl.TryCreateTimeEntry(appointment.Subject, appointment.Start, appointment.End, projectId, tagId))
+                if (this.Toggl.TryCreateAppointment(appointment.Subject, appointment.Start, appointment.End, projectId, tagId))
                 {
                     createdAppointments.Add(appointment);
                 }
@@ -209,34 +181,16 @@ namespace TogglOutlookPlugIn
             MessageBox.Show($"Created {createdAppointments.Count} appointment(s) in toggl");
         }
 
-        private bool TryParseCategory(AppointmentItem appointment, out Categories.Category category)
-        {
-            category = null;
-            if (!string.IsNullOrWhiteSpace(appointment.Categories)
-                && !appointment.Categories.Contains(CategoryManager.CategorySeperator))
-            {
-                category = CategoryManager.Instance.Categories.FirstOrDefault(c => c.Name == appointment.Categories && !c.IsOutlookOnly);
-            }
-
-            return category != null;
-        }
-
         #region IRibbonExtensibility Members
 
-        public string GetCustomUI(string ribbonID)
-        {
-            return GetResourceText("TogglOutlookPlugIn.CalendarContextMenu.xml");
-        }
+        public string GetCustomUI(string ribbonID) => GetResourceText("TogglOutlookPlugIn.CalendarContextMenu.xml");
 
         #endregion
 
         #region Ribbon Callbacks
         //Create callback methods here. For more information about adding callback methods, visit https://go.microsoft.com/fwlink/?LinkID=271226
 
-        public void Ribbon_Load(Office.IRibbonUI ribbonUI)
-        {
-            this.ribbon = ribbonUI;
-        }
+        public void Ribbon_Load(Office.IRibbonUI ribbonUI) => this.ribbon = ribbonUI;
 
         #endregion
 

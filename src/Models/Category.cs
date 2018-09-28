@@ -1,6 +1,6 @@
 ﻿using System.Xml.Serialization;
 
-namespace TogglOutlookPlugIn.Categories
+namespace TogglOutlookPlugIn.Models
 {
     public class Category
     {
