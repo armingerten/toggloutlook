@@ -22,7 +22,7 @@ namespace TogglOutlookPlugIn.Settings
 
         private CategoryService CategoryService => CategoryService.Instance;
 
-        private void PopulateComboBoxesProjectsAndTags()
+        public void PopulateComboBoxesProjectsAndTags()
         {
             // Projects
             this.comboBoxProjects.DataSource = this.Toggl.Projects;
@@ -68,6 +68,21 @@ namespace TogglOutlookPlugIn.Settings
             => this.Toggl.Tags.FirstOrDefault(tag => tag.Id == tagId)?.Name
             ?? (tagId == default(int) ? string.Empty : tagId.ToString());
 
+        private bool TryGetSelectedCategory(out Category selectedCategory)
+        {
+            if (this.listViewCategories.SelectedItems.Count == 1
+                && this.listViewCategories.SelectedItems[0].Tag is Category selectedItemTag)
+            {
+                selectedCategory = selectedItemTag;
+                return true;
+            }
+            else
+            {
+                selectedCategory = null;
+                return false;
+            }
+        }
+
         private void OnButtonAddCategoryClick(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(this.textBoxCategoryName.Text))
@@ -84,18 +99,35 @@ namespace TogglOutlookPlugIn.Settings
             }
         }
 
-        private void OnToolStripMenuItemDeleteCategoryClick
-            (object sender, EventArgs e)
+        private void OnToolStripMenuItemDeleteCategoryClick(object sender, EventArgs e)
         {
-            if (this.listViewCategories.SelectedItems.Count < 1)
-            {
-                return;
-            }
-
-            if ((this.listViewCategories.SelectedItems[0].Tag is Category selectedCategory))
+            if (this.TryGetSelectedCategory(out Category selectedCategory))
             {
                 this.CategoryService.RemoveCategory(selectedCategory);
                 this.PopulateListViewCategories();
+            }
+        }
+
+        private void OnListViewCategoriesSelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (this.TryGetSelectedCategory(out Category selectedCategory))
+            {
+                this.textBoxCategoryName.Text = selectedCategory.Name;
+
+                if (!selectedCategory.IsOutlookOnly)
+                {
+                    int projectIndex = this.comboBoxProjects.FindStringExact(this.GetProjectName(selectedCategory.ProjectId));
+                    if (projectIndex > -1)
+                    {
+                        this.comboBoxProjects.SelectedIndex = projectIndex;
+                    }
+
+                    int tagIndex = this.comboBoxTags.FindStringExact(this.GetTagName(selectedCategory.TagId));
+                    if (tagIndex > -1)
+                    {
+                        this.comboBoxTags.SelectedIndex = tagIndex;
+                    }
+                }
             }
         }
     }

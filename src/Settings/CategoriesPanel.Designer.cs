@@ -82,6 +82,7 @@
             this.listViewCategories.TabStop = false;
             this.listViewCategories.UseCompatibleStateImageBehavior = false;
             this.listViewCategories.View = System.Windows.Forms.View.Details;
+            this.listViewCategories.SelectedIndexChanged += new System.EventHandler(this.OnListViewCategoriesSelectedIndexChanged);
             // 
             // columnHeaderName
             // 

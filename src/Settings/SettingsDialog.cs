@@ -28,6 +28,7 @@ namespace TogglOutlookPlugIn.Settings
         {
             this.buttonCategoriesNavigation.Visible = this.Toggl.IsLinkEstablished;
             this.buttonSyncNavigation.Visible = this.Toggl.IsLinkEstablished;
+            this.panelCategories.PopulateComboBoxesProjectsAndTags();
         }
 
         private void OnButtonAccountNavigationClick(object sender, EventArgs e)
