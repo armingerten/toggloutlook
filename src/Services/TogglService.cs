@@ -118,17 +118,21 @@ namespace TogglOutlookPlugIn.Services
             }
         }
 
-        public void CreateOrUpdateAppointments(List<CategorizedAppointment> appointments)
+        public void CreateOrUpdateAppointments(List<CategorizedAppointment> appointments, DateTime startTime, DateTime endTime)
         {
             if (!this.IsLinkEstablished)
             {
                 return;
             }
 
-            List<TimeEntry> existingTimeEntries = this.timeEntryService.List().Result;
+            List<TimeEntry> existingTimeEntries = this.timeEntryService.List(new Toggl.Api.QueryObjects.TimeEntryParams
+            {
+                StartDate = startTime,
+                EndDate = endTime
+            }).Result;
 
             // Determine and delete conflicting entries
-            long[] conflictingTimeEntries = this.GetConflictingTimeEntryIds(existingTimeEntries, appointments);
+            long[] conflictingTimeEntries = this.GetConflictingAndObsoleteTimeEntryIds(existingTimeEntries, appointments, startTime, endTime);
             if (conflictingTimeEntries.Length > 0)
             {
                 this.timeEntryService.Delete(conflictingTimeEntries).Wait();
@@ -204,18 +208,11 @@ namespace TogglOutlookPlugIn.Services
             }
         }
 
-        private long[] GetConflictingTimeEntryIds(List<TimeEntry> existingTimeEntries, List<CategorizedAppointment> appointments)
-        {
-            List<long> conflictingTimeEntryIds = new List<long>();
-            appointments.ForEach(appointment =>
-            {
-                conflictingTimeEntryIds.AddRange(
-                    existingTimeEntries
-                        .Where(timeEntry => timeEntry.IsConflictingWith(appointment))
-                        .Select(timeEntry => (long)timeEntry.Id));
-            });
-
-            return conflictingTimeEntryIds.ToArray();
-        }
+        private long[] GetConflictingAndObsoleteTimeEntryIds(List<TimeEntry> existingTimeEntries, List<CategorizedAppointment> appointments, DateTime startTime, DateTime endTime)
+            => existingTimeEntries
+                .Where(timeEntry => timeEntry.IsConflictingOrObsolete(appointments, startTime, endTime))
+                .Select(timeEntry => (long)timeEntry.Id)
+                .Distinct()
+                .ToArray();
     }
 }

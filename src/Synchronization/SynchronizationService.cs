@@ -96,7 +96,7 @@ namespace TogglOutlookPlugIn.Synchronization
             List<CategorizedAppointment> categorizedAppointments = Calendar.GetAppointmentsBetween(startTime, endTime);
             if (this.IsOutlookAuthority)
             {
-                this.Toggl.CreateOrUpdateAppointments(categorizedAppointments);
+                this.Toggl.CreateOrUpdateAppointments(categorizedAppointments, startTime, endTime);
             }
             else
             {
