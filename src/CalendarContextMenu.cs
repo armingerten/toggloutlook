@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using Microsoft.Office.Interop.Outlook;
 using TogglOutlookPlugIn.Models;
 using TogglOutlookPlugIn.Services;
+using TogglOutlookPlugIn.Synchronization;
 using Office = Microsoft.Office.Core;
 
 namespace TogglOutlookPlugIn
@@ -34,6 +35,9 @@ namespace TogglOutlookPlugIn
 
         public bool IsContextMenuMultipleItemsVisible(Office.IRibbonControl control)
             => (control.Context as Selection)?[1] is AppointmentItem;
+
+        public bool IsSyncNowVisible(Office.IRibbonControl control)
+            => SynchronizationService.Instance.SynchronizationOption != SyncOption.NoSync;
 
         public bool IsPushAsVisible(Office.IRibbonControl control)
             => Synchronization.SynchronizationService.Instance.SynchronizationOption == Synchronization.SyncOption.NoSync;
@@ -122,6 +126,11 @@ namespace TogglOutlookPlugIn
             }
 
             selectedAppointment.Save();
+        }
+
+        public void OnSyncNowClick(Office.IRibbonControl control)
+        {
+            SynchronizationService.Instance.SynchronizeWithToggl();
         }
 
         public void OnConfigureTogglPluginClick(Office.IRibbonControl control) => new Settings.SettingsDialog().ShowDialog();
