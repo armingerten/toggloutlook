@@ -14,7 +14,12 @@
       <menuSeparator id="togglSeperator"/>
       <button id="fitToBoundaries" onAction="OnFitToBoundariesClick" label="Fit to boundaries" getImage="GetFitToBoundariesIcon" />
       <button id="quickPush" onAction="OnQuickPushClick" label="Quick push" getImage="GetTogglIcon" />
+      <button id="syncNowContextMenuCalendarItem" onAction="OnSyncNowClick" label="Sync now" getImage="GetTogglIcon" getVisible="IsSyncNowVisible"/>
       <dynamicMenu id="pushAs" label="Push as" getImage="GetTogglIcon" getContent="OnPushAsGetContent" getVisible="IsPushAsVisible" />
+    </contextMenu>
+    <contextMenu idMso="ContextMenuCalendarView">
+      <menuSeparator id="togglSeperatorCalendarView"/>
+      <button id="syncNowCalendarView" onAction="OnSyncNowClick" label="Sync now" getImage="GetTogglIcon" getVisible="IsSyncNowVisible"/>
     </contextMenu>
     <contextMenu idMso="ContextMenuMultipleItems">
       <menuSeparator id="togglSeperatorMultiple"/>

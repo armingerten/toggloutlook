@@ -77,7 +77,7 @@ namespace TogglOutlookPlugIn.Synchronization
             }
         }
 
-        private void SynchronizeWithToggl()
+        public void SynchronizeWithToggl()
         {
             DateTime startTime;
             DateTime endTime = DateTime.Now.Date.AddDays(1);
