@@ -14,7 +14,7 @@ namespace TogglOutlookPlugIn.Settings
         {
             this.InitializeComponent();
 
-            this.PopulateComboBoxesProjectsAndTags();
+            this.PopulateComboBoxes();
             this.PopulateListViewCategories();
         }
 
@@ -22,17 +22,12 @@ namespace TogglOutlookPlugIn.Settings
 
         private CategoryService CategoryService => CategoryService.Instance;
 
-        private void PopulateComboBoxesProjectsAndTags()
+        public void PopulateComboBoxes()
         {
             // Projects
             this.comboBoxProjects.DataSource = this.Toggl.Projects;
             this.comboBoxProjects.DisplayMember = nameof(TogglApi.Project.Name);
             this.comboBoxProjects.ValueMember = nameof(TogglApi.Project.Id);
-
-            // Tags
-            this.comboBoxTags.DataSource = this.Toggl.Tags;
-            this.comboBoxTags.DisplayMember = nameof(TogglApi.Tag.Name);
-            this.comboBoxTags.ValueMember = nameof(TogglApi.Tag.Id);
         }
 
         private void PopulateListViewCategories()
@@ -46,7 +41,6 @@ namespace TogglOutlookPlugIn.Settings
                 };
 
                 listViewItem.SubItems.Add(this.GetProjectName(category.ProjectId));
-                listViewItem.SubItems.Add(this.GetTagName(category.TagId));
                 if (category.IsOutlookOnly)
                 {
                     listViewItem.ForeColor = Color.Gray;
@@ -64,9 +58,20 @@ namespace TogglOutlookPlugIn.Settings
             => this.Toggl.Projects.FirstOrDefault(project => project.Id == projectId)?.Name
             ?? (projectId == default(int) ? string.Empty : projectId.ToString());
 
-        private string GetTagName(int tagId)
-            => this.Toggl.Tags.FirstOrDefault(tag => tag.Id == tagId)?.Name
-            ?? (tagId == default(int) ? string.Empty : tagId.ToString());
+        private bool TryGetSelectedCategory(out Category selectedCategory)
+        {
+            if (this.listViewCategories.SelectedItems.Count == 1
+                && this.listViewCategories.SelectedItems[0].Tag is Category selectedItemTag)
+            {
+                selectedCategory = selectedItemTag;
+                return true;
+            }
+            else
+            {
+                selectedCategory = null;
+                return false;
+            }
+        }
 
         private void OnButtonAddCategoryClick(object sender, EventArgs e)
         {
@@ -77,25 +82,35 @@ namespace TogglOutlookPlugIn.Settings
 
             if (this.CategoryService.TryAddCategory(
                 (int)this.comboBoxProjects.SelectedValue,
-                (int)this.comboBoxTags.SelectedValue,
                 this.textBoxCategoryName.Text))
             {
                 this.PopulateListViewCategories();
             }
         }
 
-        private void OnToolStripMenuItemDeleteCategoryClick
-            (object sender, EventArgs e)
+        private void OnToolStripMenuItemDeleteCategoryClick(object sender, EventArgs e)
         {
-            if (this.listViewCategories.SelectedItems.Count < 1)
-            {
-                return;
-            }
-
-            if ((this.listViewCategories.SelectedItems[0].Tag is Category selectedCategory))
+            if (this.TryGetSelectedCategory(out Category selectedCategory))
             {
                 this.CategoryService.RemoveCategory(selectedCategory);
                 this.PopulateListViewCategories();
+            }
+        }
+
+        private void OnListViewCategoriesSelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (this.TryGetSelectedCategory(out Category selectedCategory))
+            {
+                this.textBoxCategoryName.Text = selectedCategory.Name;
+
+                if (!selectedCategory.IsOutlookOnly)
+                {
+                    int projectIndex = this.comboBoxProjects.FindStringExact(this.GetProjectName(selectedCategory.ProjectId));
+                    if (projectIndex > -1)
+                    {
+                        this.comboBoxProjects.SelectedIndex = projectIndex;
+                    }
+                }
             }
         }
     }

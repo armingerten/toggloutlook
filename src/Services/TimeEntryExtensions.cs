@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Toggl.Api.DataObjects;
 using TogglOutlookPlugIn.Models;
 
 namespace TogglOutlookPlugIn.Services
@@ -7,31 +10,62 @@ namespace TogglOutlookPlugIn.Services
     {
         private static readonly string TogglResponseDateFormat = "MM/dd/yyyy HH:mm:ss";
 
-        public static bool IsOverlappingWith(this Toggl.Api.DataObjects.TimeEntry entry, DateTime startTime, DateTime endTime)
+        /// <summary>
+        /// Indicates whether this time entry is within the specified start- and end time.
+        /// </summary>
+        /// <param name="entry">The time entry.</param>
+        /// <param name="startTime">The start time.</param>
+        /// <param name="endTime">The end time.</param>
+        /// <returns>True, if this time entry is within the specified start- and end time.</returns>
+        public static bool IsOverlappingWith(this TimeEntry entry, DateTime startTime, DateTime endTime)
         {
-            DateTime entryStartTime = DateTime.ParseExact(entry.Start, TogglResponseDateFormat, null);
-            DateTime entryEndTime = DateTime.ParseExact(entry.Stop, TogglResponseDateFormat, null);
+            DateTime entryStartTime = entry.GetStartTime();
+            DateTime entryEndTime = entry.GetEndTime();
 
             return (startTime >= entryStartTime && startTime < entryEndTime)
                 || (endTime <= entryEndTime && endTime > entryStartTime);
         }
 
-        public static bool IsConflictingWith(this Toggl.Api.DataObjects.TimeEntry entry, CategorizedAppointment appointment)
+        /// <summary>
+        /// Indicates whether this time entry is conflicting with one of the specified appointments or
+        /// is no longer relevant within the specified boundaries.
+        /// </summary>
+        /// <param name="entry">The time entry.</param>
+        /// <param name="appointments">The appointments.</param>
+        /// <param name="lowerBoundary">The lower boundary.</param>
+        /// <param name="upperBoundary">The upper boundary.</param>
+        /// <returns>True, if the appointment is conflicting or obsolete.</returns>
+        public static bool IsConflictingOrObsolete(this TimeEntry entry,
+            IEnumerable<CategorizedAppointment> appointments,
+            DateTime lowerBoundary,
+            DateTime upperBoundary)
         {
-            if (!entry.IsOverlappingWith(appointment.StartTime, appointment.EndTime))
-            {
+            // Only consider time entry if it is within boundaries, otherwise it is implicitly valid
+            if (entry.GetEndTime() <= lowerBoundary || entry.GetStartTime() >= upperBoundary)
                 return false;
-            }
-            else
-            {
-                return !entry.IsEqualTo(appointment);
-            }
+
+
+            return !appointments
+                .Where(appointment => entry.IsOverlappingWith(appointment.StartTime, appointment.EndTime))
+                .Any(appointment => entry.IsEqualTo(appointment));
         }
 
-        public static bool IsEqualTo(this Toggl.Api.DataObjects.TimeEntry entry, CategorizedAppointment appointment)
-            => DateTime.ParseExact(entry.Start, TogglResponseDateFormat, null) == appointment.StartTime
-                && DateTime.ParseExact(entry.Stop, TogglResponseDateFormat, null) == appointment.EndTime
-                && entry.ProjectId == appointment.Category.ProjectId
-                && entry.Description == appointment.Description;
+        /// <summary>
+        /// Indicates whether the provided appointment's properties are equal to this time entry.
+        /// </summary>
+        /// <param name="entry">The time entry.</param>
+        /// <param name="appointment">The appointment.</param>
+        /// <returns>True, if the specified appointment's properties are equal to this time entry.</returns>
+        public static bool IsEqualTo(this TimeEntry entry, CategorizedAppointment appointment)
+            => entry.GetStartTime() == appointment.StartTime
+            && entry.GetEndTime() == appointment.EndTime
+            && entry.ProjectId == appointment.Category.ProjectId
+            && entry.Description == appointment.Description;
+
+        private static DateTime GetStartTime(this TimeEntry entry)
+            => DateTime.ParseExact(entry.Start, TogglResponseDateFormat, null);
+
+        private static DateTime GetEndTime(this TimeEntry entry)
+            => DateTime.ParseExact(entry.Stop, TogglResponseDateFormat, null);
     }
 }

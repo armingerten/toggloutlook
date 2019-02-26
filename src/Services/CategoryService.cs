@@ -21,7 +21,7 @@ namespace TogglOutlookPlugIn.Services
 
         public Category[] Categories => new CategoryList(Properties.Settings.Default.CategoriesString, this.OutlookCategories).Items.ToArray();
 
-        public bool TryAddCategory(int projectId, int tagId, string categoryName)
+        public bool TryAddCategory(int projectId, string categoryName)
         {
             if (this.IsInvalidCategoryName(categoryName))
             {
@@ -31,7 +31,7 @@ namespace TogglOutlookPlugIn.Services
             Outlook.Category outlookCategory = this.EnsureOutlookCategoryExists(categoryName);
 
             CategoryList categoryList = new CategoryList(Properties.Settings.Default.CategoriesString, this.OutlookCategories);
-            categoryList.AddOrUpdate(new Category(categoryName, projectId, tagId, outlookCategory));
+            categoryList.AddOrUpdate(new Category(categoryName, projectId, outlookCategory));
 
             Properties.Settings.Default.CategoriesString = categoryList.ItemsAsXmlString;
             Properties.Settings.Default.Save();

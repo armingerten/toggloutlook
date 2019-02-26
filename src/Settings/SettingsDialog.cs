@@ -13,21 +13,22 @@ namespace TogglOutlookPlugIn.Settings
 
             this.buttonCategoriesNavigation.Visible = this.Toggl.IsLinkEstablished;
             this.buttonSyncNavigation.Visible = this.Toggl.IsLinkEstablished;
-            this.Toggl.LinkStateChangedEvent += this.OnTogglLinkEstablishedEvent;
+            this.Toggl.WorkspaceChangedEvent += this.OnTogglWorkspaceChangedEvent;
             this.OnButtonAccountNavigationClick(this, EventArgs.Empty);
         }
 
         ~SettingsDialog()
         {
-            this.Toggl.LinkStateChangedEvent -= this.OnTogglLinkEstablishedEvent;
+            this.Toggl.WorkspaceChangedEvent -= this.OnTogglWorkspaceChangedEvent;
         }
 
         private TogglService Toggl => TogglService.Instance;
 
-        private void OnTogglLinkEstablishedEvent(object sender, EventArgs e)
+        private void OnTogglWorkspaceChangedEvent(object sender, EventArgs e)
         {
             this.buttonCategoriesNavigation.Visible = this.Toggl.IsLinkEstablished;
             this.buttonSyncNavigation.Visible = this.Toggl.IsLinkEstablished;
+            this.panelCategories.PopulateComboBoxes();
         }
 
         private void OnButtonAccountNavigationClick(object sender, EventArgs e)

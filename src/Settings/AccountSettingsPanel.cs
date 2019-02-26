@@ -31,6 +31,10 @@ namespace TogglOutlookPlugIn.Settings
             this.comboBoxWorkspace.DataSource = this.Toggl.Workspaces;
             this.comboBoxWorkspace.DisplayMember = nameof(Workspace.Name);
             this.comboBoxWorkspace.ValueMember = nameof(Workspace.Id);
+            if (this.Toggl.CurrentWorkspace != null)
+            {
+                this.comboBoxWorkspace.SelectedValue = this.Toggl.CurrentWorkspace.Id;
+            }
 
             if (this.Toggl.CurrentUser != null)
             {

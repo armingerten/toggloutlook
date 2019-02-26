@@ -18,7 +18,7 @@ namespace TogglOutlookPlugIn.Services
 
         private TogglService() => this.TryEstablishLink(this.ApiKey);
 
-        public event EventHandler<EventArgs> LinkStateChangedEvent;
+        public event EventHandler<EventArgs> WorkspaceChangedEvent;
 
         public static TogglService Instance
             => instance ?? (instance = new TogglService());
@@ -37,8 +37,6 @@ namespace TogglOutlookPlugIn.Services
         public bool IsLinkEstablished { get; private set; }
 
         public List<Project> Projects { get; private set; } = new List<Project>();
-
-        public List<Tag> Tags { get; private set; } = new List<Tag>();
 
         public List<Workspace> Workspaces { get; private set; } = new List<Workspace>();
 
@@ -65,10 +63,9 @@ namespace TogglOutlookPlugIn.Services
                 this.CurrentWorkspace = this.Workspaces.First();
                 this.CurrentUser = this.userService.GetCurrent().Result;
                 this.Projects = this.workspaceService.Projects(this.CurrentWorkspace.Id).Result;
-                this.Tags = this.workspaceService.Tags(this.CurrentWorkspace.Id).Result;
 
                 this.IsLinkEstablished = true;
-                this.LinkStateChangedEvent?.Invoke(this, EventArgs.Empty);
+                this.WorkspaceChangedEvent?.Invoke(this, EventArgs.Empty);
             }
             catch (Exception)
             {
@@ -78,10 +75,9 @@ namespace TogglOutlookPlugIn.Services
                 this.CurrentUser = null;
                 this.Workspaces.Clear();
                 this.Projects.Clear();
-                this.Tags.Clear();
 
                 this.IsLinkEstablished = false;
-                this.LinkStateChangedEvent?.Invoke(this, EventArgs.Empty);
+                this.WorkspaceChangedEvent?.Invoke(this, EventArgs.Empty);
             }
 
             return this.IsLinkEstablished;
@@ -108,7 +104,8 @@ namespace TogglOutlookPlugIn.Services
             {
                 this.CurrentWorkspace = targetWorkspace;
                 this.Projects = this.workspaceService.Projects(this.CurrentWorkspace.Id).Result;
-                this.Tags = this.workspaceService.Tags(this.CurrentWorkspace.Id).Result;
+
+                this.WorkspaceChangedEvent?.Invoke(this, EventArgs.Empty);
 
                 return true;
             }
@@ -118,17 +115,21 @@ namespace TogglOutlookPlugIn.Services
             }
         }
 
-        public void CreateOrUpdateAppointments(List<CategorizedAppointment> appointments)
+        public void CreateOrUpdateAppointments(List<CategorizedAppointment> appointments, DateTime startTime, DateTime endTime)
         {
             if (!this.IsLinkEstablished)
             {
                 return;
             }
 
-            List<TimeEntry> existingTimeEntries = this.timeEntryService.List().Result;
+            List<TimeEntry> existingTimeEntries = this.timeEntryService.List(new Toggl.Api.QueryObjects.TimeEntryParams
+            {
+                StartDate = startTime,
+                EndDate = endTime
+            }).Result;
 
             // Determine and delete conflicting entries
-            long[] conflictingTimeEntries = this.GetConflictingTimeEntryIds(existingTimeEntries, appointments);
+            long[] conflictingTimeEntries = this.GetConflictingAndObsoleteTimeEntryIds(existingTimeEntries, appointments, startTime, endTime);
             if (conflictingTimeEntries.Length > 0)
             {
                 this.timeEntryService.Delete(conflictingTimeEntries).Wait();
@@ -155,13 +156,13 @@ namespace TogglOutlookPlugIn.Services
         public bool TryCreateAppointment(CategorizedAppointment categorizedAppointment)
             => this.TryCreateAppointment(this.timeEntryService.List().Result, categorizedAppointment);
 
-        public bool TryCreateAppointment(string description, DateTime startTime, DateTime endTime, int projectId, int tagId)
-            => this.TryCreateAppointment(this.timeEntryService.List().Result, description, startTime, endTime, projectId, tagId);
+        public bool TryCreateAppointment(string description, DateTime startTime, DateTime endTime, int projectId)
+            => this.TryCreateAppointment(this.timeEntryService.List().Result, description, startTime, endTime, projectId);
 
         private bool TryCreateAppointment(List<TimeEntry> existingTimeEntries, CategorizedAppointment ca)
-            => this.TryCreateAppointment(existingTimeEntries, ca.Description, ca.StartTime, ca.EndTime, ca.Category.ProjectId, ca.Category.TagId);
+            => this.TryCreateAppointment(existingTimeEntries, ca.Description, ca.StartTime, ca.EndTime, ca.Category.ProjectId);
 
-        private bool TryCreateAppointment(List<TimeEntry> existingTimeEntries, string description, DateTime startTime, DateTime endTime, int projectId, int tagId)
+        private bool TryCreateAppointment(List<TimeEntry> existingTimeEntries, string description, DateTime startTime, DateTime endTime, int projectId)
         {
             if (!this.IsLinkEstablished)
             {
@@ -169,9 +170,7 @@ namespace TogglOutlookPlugIn.Services
             }
 
             Project project = this.Projects.FirstOrDefault(p => p.Id == projectId);
-            Tag tag = this.Tags.FirstOrDefault(t => t.Id == tagId);
-
-            if (project == null || tag == null)
+            if (project == null)
             {
                 return false;
             }
@@ -188,7 +187,6 @@ namespace TogglOutlookPlugIn.Services
                     Description = description,
                     CreatedWith = "outlook",
                     ProjectId = project.Id,
-                    TagNames = new List<string>(new[] { tag.Name }),
                     Start = startTime.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ"),
                     Duration = (long)(endTime - startTime).TotalSeconds,
                     WorkspaceId = this.CurrentWorkspace.Id,
@@ -204,18 +202,11 @@ namespace TogglOutlookPlugIn.Services
             }
         }
 
-        private long[] GetConflictingTimeEntryIds(List<TimeEntry> existingTimeEntries, List<CategorizedAppointment> appointments)
-        {
-            List<long> conflictingTimeEntryIds = new List<long>();
-            appointments.ForEach(appointment =>
-            {
-                conflictingTimeEntryIds.AddRange(
-                    existingTimeEntries
-                        .Where(timeEntry => timeEntry.IsConflictingWith(appointment))
-                        .Select(timeEntry => (long)timeEntry.Id));
-            });
-
-            return conflictingTimeEntryIds.ToArray();
-        }
+        private long[] GetConflictingAndObsoleteTimeEntryIds(List<TimeEntry> existingTimeEntries, List<CategorizedAppointment> appointments, DateTime startTime, DateTime endTime)
+            => existingTimeEntries
+                .Where(timeEntry => timeEntry.IsConflictingOrObsolete(appointments, startTime, endTime))
+                .Select(timeEntry => (long)timeEntry.Id)
+                .Distinct()
+                .ToArray();
     }
 }

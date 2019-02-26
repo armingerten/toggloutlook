@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using Microsoft.Office.Interop.Outlook;
 using TogglOutlookPlugIn.Models;
 using TogglOutlookPlugIn.Services;
+using TogglOutlookPlugIn.Synchronization;
 using Office = Microsoft.Office.Core;
 
 namespace TogglOutlookPlugIn
@@ -35,8 +36,11 @@ namespace TogglOutlookPlugIn
         public bool IsContextMenuMultipleItemsVisible(Office.IRibbonControl control)
             => (control.Context as Selection)?[1] is AppointmentItem;
 
+        public bool IsSyncNowVisible(Office.IRibbonControl control)
+            => SynchronizationService.Instance.SynchronizationOption != SyncOption.NoSync;
+
         public bool IsPushAsVisible(Office.IRibbonControl control)
-            => Synchronization.SynchronizationService.Instance.SynchronizationOption == Synchronization.SyncOption.NoSync;
+            => SynchronizationService.Instance.SynchronizationOption == SyncOption.NoSync;
 
         public string OnPushAsGetContent(Office.IRibbonControl control)
         {
@@ -44,22 +48,9 @@ namespace TogglOutlookPlugIn
             stringBuilder.AppendLine("<menu xmlns=\"http://schemas.microsoft.com/office/2006/01/customui\" >");
 
             this.Toggl.Projects.ForEach(project => stringBuilder
-                .AppendLine($"<dynamicMenu id=\"p{project.Id}\" label=\"{project.Name}\"  getContent=\"OnPushAsProjectSubMenuGetContent\" />"));
+                .AppendLine($"<button id=\"{project.Id}\" label=\"{project.Name}\"  onAction=\"OnButtonPushAsClick\" />"));
 
             stringBuilder.Append("</menu>");
-            return stringBuilder.ToString();
-        }
-
-        public string OnPushAsProjectSubMenuGetContent(Office.IRibbonControl control)
-        {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.AppendLine("<menu xmlns=\"http://schemas.microsoft.com/office/2006/01/customui\" >");
-
-            this.Toggl.Tags.ForEach(tag => stringBuilder
-                .AppendLine($"<button id=\"{control.Id}t{tag.Id}\" label=\"{tag.Name}\" onAction=\"OnButtonPushAsClick\" />"));
-
-            stringBuilder.Append("</menu>");
-
             return stringBuilder.ToString();
         }
 
@@ -68,15 +59,10 @@ namespace TogglOutlookPlugIn
         /// </summary>
         /// <param name="control">The clicked "PushAs" button containing the project / tag pattern as identifier.</param>
         public void OnButtonPushAsClick(Office.IRibbonControl control)
-        {
-            var buttonIdComponents = control.Id.TrimStart('p').Split('t');
-            int projectId = int.Parse(buttonIdComponents[0]);
-            int tagId = int.Parse(buttonIdComponents[1]);
+            => this.PushAppointmentsToToggle(GetSelectedAppointments(control), int.Parse(control.Id));
 
-            this.PushAppointmentsToToggle(GetSelectedAppointments(control), projectId, tagId);
-        }
-
-        public void OnQuickPushClick(Office.IRibbonControl control) => this.PushAppointmentsWithCategoryToToggle(GetSelectedAppointments(control));
+        public void OnQuickPushClick(Office.IRibbonControl control)
+            => this.PushAppointmentsWithCategoryToToggle(GetSelectedAppointments(control));
 
         private static List<AppointmentItem> GetSelectedAppointments(Office.IRibbonControl control)
         {
@@ -124,6 +110,8 @@ namespace TogglOutlookPlugIn
             selectedAppointment.Save();
         }
 
+        public void OnSyncNowClick(Office.IRibbonControl control) => SynchronizationService.Instance.SynchronizeWithToggl();
+
         public void OnConfigureTogglPluginClick(Office.IRibbonControl control) => new Settings.SettingsDialog().ShowDialog();
 
         private void PushAppointmentsWithCategoryToToggle(List<AppointmentItem> appointments)
@@ -166,13 +154,13 @@ namespace TogglOutlookPlugIn
         private void ShowPushingAppointmentsMessageBox(string message)
             => MessageBox.Show(message, "Pushing appointment(s) to Toggl", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-        private void PushAppointmentsToToggle(List<AppointmentItem> appointments, int projectId, int tagId)
+        private void PushAppointmentsToToggle(List<AppointmentItem> appointments, int projectId)
         {
             List<AppointmentItem> createdAppointments = new List<AppointmentItem>();
 
             appointments.ForEach(appointment =>
             {
-                if (this.Toggl.TryCreateAppointment(appointment.Subject, appointment.Start, appointment.End, projectId, tagId))
+                if (this.Toggl.TryCreateAppointment(appointment.Subject, appointment.Start, appointment.End, projectId))
                 {
                     createdAppointments.Add(appointment);
                 }
