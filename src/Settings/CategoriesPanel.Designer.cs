@@ -37,12 +37,10 @@
             this.contextMenuStripListViewCategories = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolStripMenuItemDeleteCategory = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBoxNewCategory = new System.Windows.Forms.GroupBox();
-            this.labelTag = new System.Windows.Forms.Label();
             this.labelProject = new System.Windows.Forms.Label();
             this.labelCategoryName = new System.Windows.Forms.Label();
             this.buttonAddCategory = new System.Windows.Forms.Button();
             this.textBoxCategoryName = new System.Windows.Forms.TextBox();
-            this.comboBoxTags = new System.Windows.Forms.ComboBox();
             this.comboBoxProjects = new System.Windows.Forms.ComboBox();
             this.groupBoxCategories.SuspendLayout();
             this.contextMenuStripListViewCategories.SuspendLayout();
@@ -57,7 +55,7 @@
             this.groupBoxCategories.Controls.Add(this.listViewCategories);
             this.groupBoxCategories.Location = new System.Drawing.Point(12, 8);
             this.groupBoxCategories.Name = "groupBoxCategories";
-            this.groupBoxCategories.Size = new System.Drawing.Size(676, 266);
+            this.groupBoxCategories.Size = new System.Drawing.Size(676, 294);
             this.groupBoxCategories.TabIndex = 16;
             this.groupBoxCategories.TabStop = false;
             this.groupBoxCategories.Text = "All Categories";
@@ -77,7 +75,7 @@
             this.listViewCategories.Location = new System.Drawing.Point(6, 19);
             this.listViewCategories.MultiSelect = false;
             this.listViewCategories.Name = "listViewCategories";
-            this.listViewCategories.Size = new System.Drawing.Size(664, 241);
+            this.listViewCategories.Size = new System.Drawing.Size(664, 269);
             this.listViewCategories.TabIndex = 8;
             this.listViewCategories.TabStop = false;
             this.listViewCategories.UseCompatibleStateImageBehavior = false;
@@ -118,28 +116,17 @@
             // 
             this.groupBoxNewCategory.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBoxNewCategory.Controls.Add(this.labelTag);
             this.groupBoxNewCategory.Controls.Add(this.labelProject);
             this.groupBoxNewCategory.Controls.Add(this.labelCategoryName);
             this.groupBoxNewCategory.Controls.Add(this.buttonAddCategory);
             this.groupBoxNewCategory.Controls.Add(this.textBoxCategoryName);
-            this.groupBoxNewCategory.Controls.Add(this.comboBoxTags);
             this.groupBoxNewCategory.Controls.Add(this.comboBoxProjects);
-            this.groupBoxNewCategory.Location = new System.Drawing.Point(12, 280);
+            this.groupBoxNewCategory.Location = new System.Drawing.Point(12, 308);
             this.groupBoxNewCategory.Name = "groupBoxNewCategory";
-            this.groupBoxNewCategory.Size = new System.Drawing.Size(676, 108);
+            this.groupBoxNewCategory.Size = new System.Drawing.Size(676, 80);
             this.groupBoxNewCategory.TabIndex = 17;
             this.groupBoxNewCategory.TabStop = false;
             this.groupBoxNewCategory.Text = "New Category";
-            // 
-            // labelTag
-            // 
-            this.labelTag.AutoSize = true;
-            this.labelTag.Location = new System.Drawing.Point(16, 75);
-            this.labelTag.Name = "labelTag";
-            this.labelTag.Size = new System.Drawing.Size(26, 13);
-            this.labelTag.TabIndex = 20;
-            this.labelTag.Text = "Tag";
             // 
             // labelProject
             // 
@@ -161,7 +148,7 @@
             // 
             // buttonAddCategory
             // 
-            this.buttonAddCategory.Location = new System.Drawing.Point(534, 70);
+            this.buttonAddCategory.Location = new System.Drawing.Point(534, 43);
             this.buttonAddCategory.Name = "buttonAddCategory";
             this.buttonAddCategory.Size = new System.Drawing.Size(136, 23);
             this.buttonAddCategory.TabIndex = 17;
@@ -175,14 +162,6 @@
             this.textBoxCategoryName.Name = "textBoxCategoryName";
             this.textBoxCategoryName.Size = new System.Drawing.Size(433, 20);
             this.textBoxCategoryName.TabIndex = 16;
-            // 
-            // comboBoxTags
-            // 
-            this.comboBoxTags.FormattingEnabled = true;
-            this.comboBoxTags.Location = new System.Drawing.Point(95, 72);
-            this.comboBoxTags.Name = "comboBoxTags";
-            this.comboBoxTags.Size = new System.Drawing.Size(433, 21);
-            this.comboBoxTags.TabIndex = 15;
             // 
             // comboBoxProjects
             // 
@@ -214,10 +193,8 @@
         private System.Windows.Forms.GroupBox groupBoxNewCategory;
         private System.Windows.Forms.Button buttonAddCategory;
         private System.Windows.Forms.TextBox textBoxCategoryName;
-        private System.Windows.Forms.ComboBox comboBoxTags;
         private System.Windows.Forms.ComboBox comboBoxProjects;
         private System.Windows.Forms.Label labelCategoryName;
-        private System.Windows.Forms.Label labelTag;
         private System.Windows.Forms.Label labelProject;
         private System.Windows.Forms.ListView listViewCategories;
         private System.Windows.Forms.ColumnHeader columnHeaderName;

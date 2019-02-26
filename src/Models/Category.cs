@@ -15,11 +15,10 @@ namespace TogglOutlookPlugIn.Models
             this.OutlookCategory = outlookCategory;
         }
 
-        public Category(string name, int projectId, int tagId, Microsoft.Office.Interop.Outlook.Category outlookCategory)
+        public Category(string name, int projectId, Microsoft.Office.Interop.Outlook.Category outlookCategory)
         {
             this.Name = name;
             this.ProjectId = projectId;
-            this.TagId = tagId;
             this.OutlookCategory = outlookCategory;
         }
 
@@ -29,11 +28,8 @@ namespace TogglOutlookPlugIn.Models
         [XmlAttribute]
         public int ProjectId { get; set; }
 
-        [XmlAttribute]
-        public int TagId { get; set; }
-
         [XmlIgnore]
-        public bool IsOutlookOnly => this.ProjectId <= 0 || this.TagId <= 0;
+        public bool IsOutlookOnly => this.ProjectId <= 0;
 
         [XmlIgnore]
         public bool IsOutlookCategoryMissing => this.OutlookCategory == null;

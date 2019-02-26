@@ -14,7 +14,7 @@ namespace TogglOutlookPlugIn.Settings
         {
             this.InitializeComponent();
 
-            this.PopulateComboBoxesProjectsAndTags();
+            this.PopulateComboBoxes();
             this.PopulateListViewCategories();
         }
 
@@ -22,17 +22,12 @@ namespace TogglOutlookPlugIn.Settings
 
         private CategoryService CategoryService => CategoryService.Instance;
 
-        public void PopulateComboBoxesProjectsAndTags()
+        public void PopulateComboBoxes()
         {
             // Projects
             this.comboBoxProjects.DataSource = this.Toggl.Projects;
             this.comboBoxProjects.DisplayMember = nameof(TogglApi.Project.Name);
             this.comboBoxProjects.ValueMember = nameof(TogglApi.Project.Id);
-
-            // Tags
-            this.comboBoxTags.DataSource = this.Toggl.Tags;
-            this.comboBoxTags.DisplayMember = nameof(TogglApi.Tag.Name);
-            this.comboBoxTags.ValueMember = nameof(TogglApi.Tag.Id);
         }
 
         private void PopulateListViewCategories()
@@ -46,7 +41,6 @@ namespace TogglOutlookPlugIn.Settings
                 };
 
                 listViewItem.SubItems.Add(this.GetProjectName(category.ProjectId));
-                listViewItem.SubItems.Add(this.GetTagName(category.TagId));
                 if (category.IsOutlookOnly)
                 {
                     listViewItem.ForeColor = Color.Gray;
@@ -63,10 +57,6 @@ namespace TogglOutlookPlugIn.Settings
         private string GetProjectName(int projectId)
             => this.Toggl.Projects.FirstOrDefault(project => project.Id == projectId)?.Name
             ?? (projectId == default(int) ? string.Empty : projectId.ToString());
-
-        private string GetTagName(int tagId)
-            => this.Toggl.Tags.FirstOrDefault(tag => tag.Id == tagId)?.Name
-            ?? (tagId == default(int) ? string.Empty : tagId.ToString());
 
         private bool TryGetSelectedCategory(out Category selectedCategory)
         {
@@ -92,7 +82,6 @@ namespace TogglOutlookPlugIn.Settings
 
             if (this.CategoryService.TryAddCategory(
                 (int)this.comboBoxProjects.SelectedValue,
-                (int)this.comboBoxTags.SelectedValue,
                 this.textBoxCategoryName.Text))
             {
                 this.PopulateListViewCategories();
@@ -120,12 +109,6 @@ namespace TogglOutlookPlugIn.Settings
                     if (projectIndex > -1)
                     {
                         this.comboBoxProjects.SelectedIndex = projectIndex;
-                    }
-
-                    int tagIndex = this.comboBoxTags.FindStringExact(this.GetTagName(selectedCategory.TagId));
-                    if (tagIndex > -1)
-                    {
-                        this.comboBoxTags.SelectedIndex = tagIndex;
                     }
                 }
             }
